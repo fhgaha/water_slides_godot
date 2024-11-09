@@ -1,67 +1,136 @@
 @tool
 class_name TubeSegment extends Node3D
 
+@export var draw: bool = false
+@export var draw_line_gizmo: bool = false
+@export var amnt = 10
 @export var control_points: Array[Node3D]
 
-var points: Array[Transform3D]:
+var control_points_transforms: Array[Transform3D]:
 	get:
 		assert(control_points.all(func(cp: Node3D): return cp != null))
-		return control_points.map(func(cp: Node3D): return cp.transform)
+		var result: Array[Transform3D]
+		result.assign(control_points.map(func(cp: Node3D): return cp.transform))
+		return result
+
+var control_points_positions: Array[Vector3]:
+	get:
+		assert(control_points.all(func(cp: Node3D): return cp != null))
+		var result: Array[Vector3]
+		result.assign(control_points.map(func(cp: Node3D): return cp.position))
+		return result
 
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
+var bez_ops: Array[OrientedPoint] = []
 
 func get_pos(i: int) -> Vector3:
 	return control_points[i].position
 
 func _ready() -> void:
+	DebugDraw3D.scoped_config().set_thickness(0.1)
 	pass
 
 func _process(delta: float) -> void:
-	#draw_line()
-	#generate_mesh()
+	create_bez_pts()
+	generate_mesh()
 	
 	pass 
 
-func draw_line():
+
+func create_bez_pts():
 	DebugDraw3D.clear_all()
-	
-	var amnt = 10
+	if !draw: return
 	
 	var positions: Array[Vector3]
 	positions.assign(
 		control_points.map(func(cp: Node3D): return cp.position)
 	)
 	
+	bez_ops.clear()
 	for i in amnt:
 		var t = i as float/(amnt - 1) as float
-		var bezier_pt = get_point(positions, t)
-		
-		DebugDraw3D.draw_box(bezier_pt, Quaternion.IDENTITY, Vector3.ONE)
+		var op: OrientedPoint = OrientedPoint.new() \
+			.with_vals( 
+				get_point(positions, t), 
+				get_orientation_3d(control_points_positions, t, Vector3.UP) 
+			)
+		bez_ops.append(op)
+	
+	if draw_line_gizmo:
+		var arr: Array = bez_ops.map(func(op: OrientedPoint): return op.pos)
+		DebugDraw3D.draw_line_path(arr)
 
 
 func generate_mesh():
-	print(Time.get_datetime_string_from_system())
 	var mesh = mesh_instance_3d.mesh as ArrayMesh
+	mesh.clear_surfaces()
 	
-	var vertices = PackedVector3Array()
-	var normals  = PackedVector3Array()
-	var uvs      = PackedVector2Array()
-	var tris     = PackedInt32Array()
+	if draw:
+		var shape = ExtrudeShape.circle_8()
+		extrude(mesh, shape, bez_ops)
+
+func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
+	var verts_in_shape: int = shape.vertex_count()
+	var segments: int = path.size() - 1
+	var edge_loops: int = path.size()
+	var vert_count: int = shape.vertex_count() * edge_loops
+	var tri_count: int = shape.line_count() * segments
+	var tri_index_count: int = tri_count * 3
+	
+	var triangle_indices = PackedInt32Array()  
+	var vertices         = PackedVector3Array()
+	var normals          = PackedVector3Array()
+	var uvs              = PackedVector2Array()
+	triangle_indices.resize(tri_index_count)
+	vertices        .resize(vert_count)
+	normals         .resize(vert_count)
+	uvs             .resize(vert_count)
 	
 	var surface_array = []
 	surface_array.resize(Mesh.ARRAY_MAX)
 	
 	#gen code
+	for i in path.size():
+		var offset: int = i * verts_in_shape
+		for j in verts_in_shape:
+			var id: int = offset + j
+			vertices.insert(
+				id, 
+				path[i].local_to_world(
+					Utils.vec2_extrude(shape.vertices[j].point)
+			))
+			normals.insert(
+				id,
+				path[i].local_to_world_direction(
+					Utils.vec2_extrude(shape.vertices[j].normal)
+			))
+			uvs.insert(id, Vector2(
+				shape.vertices[j].u, i / edge_loops as float
+			))
+	
+	var ti: int = 0
+	for i in segments:
+		var offset: int = i * verts_in_shape
+		for l in range(0, shape.line_count(), 2):
+			var a: int = offset + shape.line_indices[l] + verts_in_shape
+			var b: int = offset + shape.line_indices[l]
+			var c: int = offset + shape.line_indices[l + 1]
+			var d: int = offset + shape.line_indices[l + 1] + verts_in_shape
+			triangle_indices.set(ti, a); ti += 1;
+			triangle_indices.set(ti, b); ti += 1;
+			triangle_indices.set(ti, c); ti += 1;
+			triangle_indices.set(ti, c); ti += 1;
+			triangle_indices.set(ti, d); ti += 1;
+			triangle_indices.set(ti, a); ti += 1;
 	
 	
 	surface_array[Mesh.ARRAY_VERTEX] = vertices
 	surface_array[Mesh.ARRAY_TEX_UV] = uvs
 	surface_array[Mesh.ARRAY_NORMAL] = normals
-	surface_array[Mesh.ARRAY_INDEX]  = tris
+	surface_array[Mesh.ARRAY_INDEX]  = triangle_indices
 	
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
 
-# optimize this thing
 func get_point(pts: Array[Vector3], t: float) -> Vector3:
 	var a: Vector3 = lerp(pts[0], pts[1], t)
 	var b: Vector3 = lerp(pts[1], pts[2], t)

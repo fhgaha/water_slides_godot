@@ -1,4 +1,4 @@
-class_name MeshShape2d
+class_name ExtrudeShape
 
 class Vertex:
 	var point: Vector2
@@ -14,7 +14,7 @@ class Vertex:
 var vertices: Array[Vertex]
 var line_indices: Array[int]
 
-func with_vals(vertices: Array[Vertex], line_indeces: Array[int]) -> MeshShape2d:
+func with_vals(vertices: Array[Vertex], line_indeces: Array[int]) -> ExtrudeShape:
 	self.vertices = vertices
 	self.line_indices = line_indeces
 	return self
@@ -35,10 +35,10 @@ func calc_u_span() -> float:
 	
 	return dist
 
-func circle_8() -> MeshShape2d:
+static func circle_8() -> ExtrudeShape:
 	var sqrt: float = 1.0/sqrt(2.0)
-	return MeshShape2d.new().with_vals( \
-		#vertices: 
+	return ExtrudeShape.new().with_vals( \
+		#vertices:
 		[ \
 			# TODO: set correct normals
 			Vertex.new().with_vals(Vector2(0.0, 1.0),       Vector2.UP, 	 1.000     ), \
