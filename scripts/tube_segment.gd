@@ -28,11 +28,11 @@ func draw_line():
 	var amnt = 10
 	
 	var positions: Array[Vector3]
-	var position_untyped_arr: Array = control_points.map(
-		func(cp: Node3D): return cp.position)
-	positions.assign(position_untyped_arr)
+	positions.assign(
+		control_points.map(func(cp: Node3D): return cp.position)
+	)
 	
-	for i in range(0, amnt):
+	for i in amnt:
 		var t = i as float/(amnt - 1) as float
 		var bezier_pt = get_point(positions, t)
 		
