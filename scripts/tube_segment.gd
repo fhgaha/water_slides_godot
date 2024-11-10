@@ -105,7 +105,8 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 					Utils.vec2_extrude(shape.vertices[j].normal)
 			))
 			uvs.insert(id, Vector2(
-				shape.vertices[j].u, i / edge_loops as float
+				shape.vertices[j].u, 
+				(i as float / edge_loops as float) * get_length_approx()/shape.calc_u_span()
 			))
 	
 	var ti: int = 0
@@ -128,7 +129,6 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	surface_array[Mesh.ARRAY_TEX_UV] = uvs
 	surface_array[Mesh.ARRAY_NORMAL] = normals
 	surface_array[Mesh.ARRAY_INDEX]  = triangle_indices
-	
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
 	
 	##surface tool
@@ -186,3 +186,20 @@ func quaternion_look_rotation(forward: Vector3, up: Vector3) -> Quaternion:
 	return Quaternion.from_euler(
 		Transform3D.IDENTITY.looking_at(forward, up).basis.get_euler()
 	)
+
+func get_length_approx() -> float:
+	const PRESCISION = 8
+	var points: Array[Vector3] = []
+	
+	for i in PRESCISION:
+		var t = i as float / (PRESCISION - 1) as float
+		var pt: Vector3 = get_point(control_points_positions, t)
+		points.append(pt)
+	
+	var dist: float = 0.
+	for i in PRESCISION - 1:
+		var a = points[i];
+		var b = points[i + 1];
+		dist += (a - b).length()
+	
+	return dist
