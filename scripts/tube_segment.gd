@@ -123,13 +123,26 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 			triangle_indices.set(ti, d); ti += 1;
 			triangle_indices.set(ti, a); ti += 1;
 	
-	
+	##array mesh
 	surface_array[Mesh.ARRAY_VERTEX] = vertices
 	surface_array[Mesh.ARRAY_TEX_UV] = uvs
 	surface_array[Mesh.ARRAY_NORMAL] = normals
 	surface_array[Mesh.ARRAY_INDEX]  = triangle_indices
 	
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
+	
+	##surface tool
+	#var st = SurfaceTool.new()
+	#st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	#for i in vert_count:
+		#st.set_uv(uvs[i])
+		#st.set_normal(normals[i])
+		#st.add_vertex(vertices[i])
+	#
+	#st.generate_normals()
+	##mesh = st.commit()
+	#$MeshInstance3D.mesh = st.commit()
+
 
 func get_point(pts: Array[Vector3], t: float) -> Vector3:
 	var a: Vector3 = lerp(pts[0], pts[1], t)
