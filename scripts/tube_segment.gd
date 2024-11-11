@@ -4,55 +4,34 @@ class_name TubeSegment extends Node3D
 @export var draw: bool = false
 @export var draw_line_gizmo: bool = false
 @export var amnt = 10
-@export var control_points: Array[Node3D]
-
-var control_points_transforms: Array[Transform3D]:
-	get:
-		assert(control_points.all(func(cp: Node3D): return cp != null))
-		var result: Array[Transform3D]
-		result.assign(control_points.map(func(cp: Node3D): return cp.transform))
-		return result
-
-var control_points_positions: Array[Vector3]:
-	get:
-		assert(control_points.all(func(cp: Node3D): return cp != null))
-		var result: Array[Vector3]
-		result.assign(control_points.map(func(cp: Node3D): return cp.position))
-		return result
+@export var start: Node3D
+@export var end: Node3D
 
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
 var bez_ops: Array[OrientedPoint] = []
 var bezier: CubicBezier3d
 
-func get_pos(i: int) -> Vector3:
-	return control_points[i].position
-
 func _ready() -> void:
 	DebugDraw3D.scoped_config().set_thickness(0.1)
 	bezier = CubicBezier3d.new()
-		
-	pass
 
 func _physics_process(delta: float) -> void:
 	create_bez_pts()
 	generate_mesh()
-	
-	pass 
-
 
 func create_bez_pts():
 	DebugDraw3D.clear_all()
 	if !draw: return
 	
-	bezier = bezier.with_control_points(control_points_positions)
+	bezier = bezier.with_control_points_2pts_case(start, end)
 	
 	bez_ops.clear()
 	for i in amnt:
 		var t = i as float/(amnt - 1) as float
 		var op: OrientedPoint = OrientedPoint.new() \
-			.with_vals( 
-				bezier.get_point(t), 
-				bezier.get_orientation_3d(control_points_positions, t, Vector3.UP) 
+			.with_vals(
+				bezier.get_point(t),
+				bezier.get_orientation_3d(t, Vector3.UP)
 			)
 		bez_ops.append(op)
 	
@@ -159,7 +138,7 @@ func get_length_approx() -> float:
 func calc_length_table_into(arr: Array[float], bezier: CubicBezier3d):
 	arr[0] = 0.
 	var total_length: float = 0.
-	var prev: Vector3 = bezier.p0
+	var prev: Vector3 = bezier.pts[0]
 	for i in arr.size():
 		var t: float = (i as float)/(arr.size() - 1)
 		var pt: Vector3 = bezier.get_point(t)
