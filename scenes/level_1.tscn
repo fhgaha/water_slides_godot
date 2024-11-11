@@ -1,41 +1,60 @@
-[gd_scene load_steps=5 format=3 uid="uid://d2vkkoebpn7nl"]
+[gd_scene load_steps=8 format=3 uid="uid://d2vkkoebpn7nl"]
 
 [ext_resource type="Script" path="res://scripts/tube_segment.gd" id="1_0naeh"]
 [ext_resource type="Texture2D" uid="uid://vvw05k6qshev" path="res://assets/img/stripes2.png" id="2_ad15c"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a2quq"]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_rk6jl"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_dcydq"]
+sky_material = SubResource("ProceduralSkyMaterial_rk6jl")
+
+[sub_resource type="Environment" id="Environment_tw5sw"]
+background_mode = 2
+sky = SubResource("Sky_dcydq")
+tonemap_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0jvax"]
 albedo_texture = ExtResource("2_ad15c")
-uv1_scale = Vector3(1, 0.505, 1)
+uv1_scale = Vector3(1, 1.1, 1)
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_ubdtt"]
 
 [node name="level_1" type="Node3D"]
 
-[node name="tube_segment" type="Node3D" parent="." node_paths=PackedStringArray("control_points")]
-script = ExtResource("1_0naeh")
-amnt = 8
-control_points = [NodePath("control_pts/control_pt_0"), NodePath("control_pts/control_pt_1"), NodePath("control_pts/control_pt_2"), NodePath("control_pts/control_pt_3")]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_tw5sw")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="tube_segment"]
-material_override = SubResource("StandardMaterial3D_a2quq")
-mesh = SubResource("ArrayMesh_ubdtt")
-
-[node name="control_pts" type="Node" parent="tube_segment"]
-
-[node name="control_pt_0" type="Node3D" parent="tube_segment/control_pts"]
-transform = Transform3D(0.441742, 0, 0, 0, 1.26076, 0, 0, 0, 0.811877, 28.224, 19.8889, 0)
-
-[node name="control_pt_1" type="Node3D" parent="tube_segment/control_pts"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.14666, 29.7255, 0)
-
-[node name="control_pt_2" type="Node3D" parent="tube_segment/control_pts"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.3273, 15.6334, 0)
-
-[node name="control_pt_3" type="Node3D" parent="tube_segment/control_pts"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.2273, 0, 0)
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-0.885969, -0.162399, 0.434379, -3.72529e-09, 0.936678, 0.350191, -0.463744, 0.310258, -0.829868, 9.95998, 21.542, -16.538)
+visible = false
 
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
 transform = Transform3D(0.668248, 0, 0.743938, 0, 1, 0, -0.743938, 0, 0.668248, -56.0646, 77.2793, 31.932)
 light_color = Color(1, 0.980667, 0.42, 1)
 light_energy = 11.838
 omni_range = 261.112
+
+[node name="tube_segment" type="Node3D" parent="." node_paths=PackedStringArray("control_points")]
+script = ExtResource("1_0naeh")
+control_points = [NodePath("control_pts/control_pt_0"), NodePath("control_pts/control_pt_1"), NodePath("control_pts/control_pt_2"), NodePath("control_pts/control_pt_3")]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="tube_segment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.74803, -0.98991, 0)
+material_override = SubResource("StandardMaterial3D_0jvax")
+mesh = SubResource("ArrayMesh_ubdtt")
+
+[node name="control_pts" type="Node" parent="tube_segment"]
+
+[node name="control_pt_0" type="Node3D" parent="tube_segment/control_pts"]
+transform = Transform3D(0.441742, 0, 0, 0, 1.26076, 0, 0, 0, 0.811877, 13.8488, 18.8052, 0)
+
+[node name="control_pt_1" type="Node3D" parent="tube_segment/control_pts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.14666, -28.4484, 0)
+
+[node name="control_pt_2" type="Node3D" parent="tube_segment/control_pts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.03723, 15.614, 0)
+
+[node name="control_pt_3" type="Node3D" parent="tube_segment/control_pts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.2273, 0, 0)

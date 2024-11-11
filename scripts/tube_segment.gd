@@ -22,12 +22,15 @@ var control_points_positions: Array[Vector3]:
 
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
 var bez_ops: Array[OrientedPoint] = []
+var bezier: CubicBezier3d
 
 func get_pos(i: int) -> Vector3:
 	return control_points[i].position
 
 func _ready() -> void:
 	DebugDraw3D.scoped_config().set_thickness(0.1)
+	bezier = CubicBezier3d.new()
+		
 	pass
 
 func _physics_process(delta: float) -> void:
@@ -41,18 +44,15 @@ func create_bez_pts():
 	DebugDraw3D.clear_all()
 	if !draw: return
 	
-	var positions: Array[Vector3]
-	positions.assign(
-		control_points.map(func(cp: Node3D): return cp.position)
-	)
+	bezier = bezier.with_control_points(control_points_positions)
 	
 	bez_ops.clear()
 	for i in amnt:
 		var t = i as float/(amnt - 1) as float
 		var op: OrientedPoint = OrientedPoint.new() \
 			.with_vals( 
-				get_point(positions, t), 
-				get_orientation_3d(control_points_positions, t, Vector3.UP) 
+				bezier.get_point(t), 
+				bezier.get_orientation_3d(control_points_positions, t, Vector3.UP) 
 			)
 		bez_ops.append(op)
 	
@@ -90,9 +90,15 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	surface_array.resize(Mesh.ARRAY_MAX)
 	var uv_length_compensation: float = get_length_approx()/shape.calc_u_span()
 	
+	##look up table makes only part of mesh to work
+	var look_up: Array[float] = []
+	look_up.resize(edge_loops)
+	calc_length_table_into(look_up, bezier)
+	
 	#gen code
-	for i in path.size():
+	for i in edge_loops:
 		var offset: int = i * verts_in_shape
+		var length: float = sample(look_up, (i as float) / edge_loops)
 		for j in verts_in_shape:
 			var id: int = offset + j
 			vertices.insert(
@@ -105,9 +111,13 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 				path[i].local_to_world_direction(
 					Utils.vec2_extrude(shape.vertices[j].normal)
 			))
-			uvs.insert(id, Vector2(
-				shape.vertices[j].u, 
-				(i as float / edge_loops as float) * uv_length_compensation
+			uvs.insert(
+				id, 
+				Vector2(
+					shape.vertices[j].u, 
+					(i as float) / edge_loops * uv_length_compensation
+					##look up table makes only part of mesh to work
+					#sample(look_up, length)
 			))
 	
 	var ti: int = 0
@@ -132,61 +142,10 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	surface_array[Mesh.ARRAY_INDEX]  = triangle_indices
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
 	
-	##surface tool
-	#var st = SurfaceTool.new()
-	#st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	#for i in vert_count:
-		#st.set_uv(uvs[i])
-		#st.set_normal(normals[i])
-		#st.add_vertex(vertices[i])
-	#
-	#st.generate_normals()
-	##mesh = st.commit()
-	#$MeshInstance3D.mesh = st.commit()
-
-
-func get_point(pts: Array[Vector3], t: float) -> Vector3:
-	var a: Vector3 = lerp(pts[0], pts[1], t)
-	var b: Vector3 = lerp(pts[1], pts[2], t)
-	var c: Vector3 = lerp(pts[2], pts[3], t)
-	var d: Vector3 = lerp(a, b, t)
-	var e: Vector3 = lerp(b, c, t)
-	return lerp(d, e, t)
-
-func get_tangent(pts: Array[Vector3], t: float) -> Vector3:
-	var omt: float = 1 - t
-	var omt2: float = omt * omt 
-	var t2: float = t * t
-	var tangent: Vector3 = \
-		pts[0] * (-omt2) + \
-		pts[1] * ( 3 * omt2 - 2 * omt) + \
-		pts[2] * (-3 * t2 + 2 * t) + \
-		pts[3] * t2
-	return tangent.normalized()
-
-func get_normal_2d(pts: Array[Vector3], t: float) -> Vector3:
-	var tng: Vector3 = get_tangent(pts, t)
-	return Vector3( -tng.y, tng.x, 0.0)
-
-func get_normal_3d(pts: Array[Vector3], t: float, up: Vector3) -> Vector3:
-	var tng: Vector3 = get_tangent(pts, t)
-	var binormal: Vector3 = up.cross(tng).normalized()
-	return tng.cross(binormal)
-
-func get_orientation_2d(pts: Array[Vector3], t: float) -> Quaternion:
-	var tng: Vector3 = get_tangent(pts, t)
-	var nrm: Vector3 = get_normal_2d(pts, t)
-	return quaternion_look_rotation(tng, nrm)
-
-func get_orientation_3d(pts: Array[Vector3], t: float, up: Vector3) -> Quaternion:
-	var tng: Vector3 = get_tangent(pts, t)
-	var nrm: Vector3 = get_normal_3d(pts, t, up)
-	return quaternion_look_rotation(tng, nrm)
-
-func quaternion_look_rotation(forward: Vector3, up: Vector3) -> Quaternion:
-	return Quaternion.from_euler(
-		Transform3D.IDENTITY.looking_at(forward, up).basis.get_euler()
-	)
+	#var mat = StandardMaterial3D.new()
+	#mat.albedo_texture = load("res://assets/img/stripes2.png")
+	#mat.uv1_scale = Vector3(1., 0.1, 1.)
+	#$MeshInstance3D.set_surface_override_material(0, mat)
 
 func get_length_approx() -> float:
 	const PRESCISION = 8
@@ -194,7 +153,7 @@ func get_length_approx() -> float:
 	
 	for i in PRESCISION:
 		var t = i as float / (PRESCISION - 1) as float
-		var pt: Vector3 = get_point(control_points_positions, t)
+		var pt: Vector3 = bezier.get_point(t)
 		points.append(pt)
 	
 	var dist: float = 0.
@@ -211,8 +170,8 @@ func calc_length_table_into(arr: Array[float], bezier: CubicBezier3d):
 	var total_length: float = 0.
 	var prev: Vector3 = bezier.p0
 	for i in arr.size():
-		var t = (i as float)/(arr.size() - 1)
-		var pt = bezier.get_point(t)
+		var t: float = (i as float)/(arr.size() - 1)
+		var pt: Vector3 = bezier.get_point(t)
 		var diff: float = (prev - pt).length()
 		total_length += diff
 		arr[i] = total_length
