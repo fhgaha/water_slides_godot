@@ -23,7 +23,7 @@ mesh = SubResource("ArrayMesh_ubdtt")
 [node name="control_pts" type="Node" parent="tube_segment"]
 
 [node name="control_pt_0" type="Node3D" parent="tube_segment/control_pts"]
-transform = Transform3D(0.441742, 0, 0, 0, 1.26076, 0, 0, 0, 0.811877, 3.05283, 25.2455, 5.82423)
+transform = Transform3D(0.441742, 0, 0, 0, 1.26076, 0, 0, 0, 0.811877, 28.224, 19.8889, 0)
 
 [node name="control_pt_1" type="Node3D" parent="tube_segment/control_pts"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.14666, 29.7255, 0)

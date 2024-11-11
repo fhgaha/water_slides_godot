@@ -30,7 +30,7 @@ func _ready() -> void:
 	DebugDraw3D.scoped_config().set_thickness(0.1)
 	pass
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	create_bez_pts()
 	generate_mesh()
 	
@@ -88,6 +88,7 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	
 	var surface_array = []
 	surface_array.resize(Mesh.ARRAY_MAX)
+	var uv_length_compensation: float = get_length_approx()/shape.calc_u_span()
 	
 	#gen code
 	for i in path.size():
@@ -106,7 +107,7 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 			))
 			uvs.insert(id, Vector2(
 				shape.vertices[j].u, 
-				(i as float / edge_loops as float) * get_length_approx()/shape.calc_u_span()
+				(i as float / edge_loops as float) * uv_length_compensation
 			))
 	
 	var ti: int = 0
@@ -203,3 +204,33 @@ func get_length_approx() -> float:
 		dist += (a - b).length()
 	
 	return dist
+
+#Create a lookup-table containing cumulative point distances
+func calc_length_table_into(arr: Array[float], bezier: CubicBezier3d):
+	arr[0] = 0.
+	var total_length: float = 0.
+	var prev: Vector3 = bezier.p0
+	for i in arr.size():
+		var t = (i as float)/(arr.size() - 1)
+		var pt = bezier.get_point(t)
+		var diff: float = (prev - pt).length()
+		total_length += diff
+		arr[i] = total_length
+		prev = pt
+
+#Sample the length array at t
+func sample(f_arr: Array[float], t: float) -> float:
+	var count: float = f_arr.size()
+	if count == 0:
+		push_error("Unable to sample array - it has no elements")
+		return 0.
+	if count == 1:
+		return f_arr[0]
+	var i_float: float = t * (count - 1)
+	var id_lower: int = floori(i_float)
+	var id_upper: int = floori(i_float + 1)
+	if id_upper >= count:
+		return f_arr[count - 1]
+	if id_lower < 0:
+		return f_arr[0]
+	return lerpf(f_arr[id_lower], f_arr[id_upper], i_float - id_lower)
