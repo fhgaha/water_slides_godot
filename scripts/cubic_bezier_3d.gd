@@ -2,13 +2,13 @@ class_name CubicBezier3d
 
 var pts: Array[Vector3] = [Vector3.INF, Vector3.INF, Vector3.INF, Vector3.INF]
 
-func with_control_points(arr: Array[Vector3]) -> CubicBezier3d:
+func with_4_control_points(arr: Array[Vector3]) -> CubicBezier3d:
 	assert(arr.size() == 4)
 	for i in arr.size():
 		self.pts[i] = arr[i]
 	return self
 
-func with_control_points_2pts_case(start: Node3D, end: Node3D) -> CubicBezier3d:
+func with_2_control_points(start: Node3D, end: Node3D) -> CubicBezier3d:
 	pts[0] = start.position
 	pts[1] = start.to_global(Vector3.FORWARD * start.scale.z)
 	pts[2] = end.to_global(Vector3.BACK * end.scale.z)
@@ -57,3 +57,7 @@ func quaternion_look_rotation(forward: Vector3, up: Vector3) -> Quaternion:
 	return Quaternion.from_euler(
 		Transform3D.IDENTITY.looking_at(forward, up).basis.get_euler()
 	)
+
+func get_oriented_pt(t: float, up: Vector3 = Vector3.UP) -> OrientedPoint:
+	return OrientedPoint.new() \
+		.with_vals(get_point(t), get_orientation_3d(t, up))

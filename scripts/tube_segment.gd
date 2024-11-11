@@ -23,16 +23,13 @@ func create_bez_pts():
 	DebugDraw3D.clear_all()
 	if !draw: return
 	
-	bezier = bezier.with_control_points_2pts_case(start, end)
+	bezier = bezier.with_2_control_points(start, end)
 	
 	bez_ops.clear()
 	for i in amnt:
 		var t = i as float/(amnt - 1) as float
-		var op: OrientedPoint = OrientedPoint.new() \
-			.with_vals(
-				bezier.get_point(t),
-				bezier.get_orientation_3d(t, Vector3.UP)
-			)
+		var up: Vector3 = lerp(start.basis.y, end.basis.y, t)
+		var op: OrientedPoint = bezier.get_oriented_pt(t, up)
 		bez_ops.append(op)
 	
 	if draw_line_gizmo:
@@ -111,11 +108,6 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	surface_array[Mesh.ARRAY_NORMAL] = normals
 	surface_array[Mesh.ARRAY_INDEX]  = triangle_indices
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
-	
-	#var mat = StandardMaterial3D.new()
-	#mat.albedo_texture = load("res://assets/img/stripes2.png")
-	#mat.uv1_scale = Vector3(1., 0.1, 1.)
-	#$MeshInstance3D.set_surface_override_material(0, mat)
 
 func get_length_approx() -> float:
 	const PRESCISION = 8
@@ -135,16 +127,16 @@ func get_length_approx() -> float:
 	return dist
 
 #Create a lookup-table containing cumulative point distances
-func calc_length_table_into(arr: Array[float], bezier: CubicBezier3d):
-	arr[0] = 0.
+func calc_length_table_into(to_fill: Array[float], bezier: CubicBezier3d):
+	to_fill[0] = 0.
 	var total_length: float = 0.
 	var prev: Vector3 = bezier.pts[0]
-	for i in arr.size():
-		var t: float = (i as float)/(arr.size() - 1)
+	for i in to_fill.size():
+		var t: float = (i as float)/(to_fill.size() - 1)
 		var pt: Vector3 = bezier.get_point(t)
 		var diff: float = (prev - pt).length()
 		total_length += diff
-		arr[i] = total_length
+		to_fill[i] = total_length
 		prev = pt
 
 #Sample the length array at t
