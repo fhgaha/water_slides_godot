@@ -88,9 +88,7 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	
 	var surface_array = []
 	surface_array.resize(Mesh.ARRAY_MAX)
-	var uv_length_compensation: float = get_length_approx()/shape.calc_u_span()
 	
-	##look up table makes only part of mesh to work
 	var look_up: Array[float] = []
 	look_up.resize(edge_loops)
 	calc_length_table_into(look_up, bezier)
@@ -98,7 +96,7 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	#gen code
 	for i in edge_loops:
 		var offset: int = i * verts_in_shape
-		var length: float = sample(look_up, (i as float) / edge_loops)
+		var v_length: float = sample(look_up, (i as float) / edge_loops)
 		for j in verts_in_shape:
 			var id: int = offset + j
 			vertices.insert(
@@ -111,14 +109,7 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 				path[i].local_to_world_direction(
 					Utils.vec2_extrude(shape.vertices[j].normal)
 			))
-			uvs.insert(
-				id, 
-				Vector2(
-					shape.vertices[j].u, 
-					(i as float) / edge_loops * uv_length_compensation
-					##look up table makes only part of mesh to work
-					#sample(look_up, length)
-			))
+			uvs.insert(id, Vector2(shape.vertices[j].u, v_length))
 	
 	var ti: int = 0
 	for i in segments:
