@@ -4,8 +4,8 @@ class_name TubeSegment extends Node3D
 @export var draw: bool = false
 @export var draw_line_gizmo: bool = false
 @export var amnt = 10
-@export var start: ControlPoint
-@export var end: ControlPoint
+@export var start: Node3D
+@export var end: Node3D
  
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
 var bezier_ops: Array[OrientedPoint] = []
@@ -14,6 +14,17 @@ var bezier: CubicBezier3d
 func _ready() -> void:
 	DebugDraw3D.scoped_config().set_thickness(0.1)
 	bezier = CubicBezier3d.new()
+	
+	mesh_instance_3d.mesh = mesh_instance_3d.mesh.duplicate()
+	#set up mesh instance
+	#mesh_instance_3d = MeshInstance3D.new()
+	#add_child(mesh_instance_3d)
+	#mesh_instance_3d.mesh = ArrayMesh.new()
+	#mesh_instance_3d.mesh.resource_local_to_scene = true
+	#var mat = StandardMaterial3D.new()
+	#mat.albedo_texture = load("res://assets/img/stripes.png")
+	#mat.uv1_scale = Vector3(1., 0.1, 1.)
+	#mesh_instance_3d.material_override = mat
 
 func _physics_process(delta: float) -> void:
 	clear_and_try_generate()
@@ -25,8 +36,8 @@ func clear_and_try_generate():
 	
 	if !draw: return
 	
-	assert(start, "No start point assigned")
-	assert(end, "No end point assigned")
+	assert(start, "%s: No start point assigned" % name)
+	assert(end, "%s: No end point assigned" % name)
 	
 	generate_bezier_ops()
 	
@@ -109,6 +120,7 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	surface_array[Mesh.ARRAY_TEX_UV] = uvs
 	surface_array[Mesh.ARRAY_NORMAL] = normals
 	surface_array[Mesh.ARRAY_INDEX]  = triangle_indices
+	mesh.resource_local_to_scene = true
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
 
 func get_length_approx() -> float:
