@@ -4,11 +4,11 @@ class_name TubeSegment extends Node3D
 @export var draw: bool = false
 @export var draw_line_gizmo: bool = false
 @export var amnt = 10
-@export var start: Node3D
-@export var end: Node3D
+@export var start: ControlPoint
+@export var end: ControlPoint
  
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
-var bez_ops: Array[OrientedPoint] = []
+var bezier_ops: Array[OrientedPoint] = []
 var bezier: CubicBezier3d
 
 func _ready() -> void:
@@ -16,34 +16,36 @@ func _ready() -> void:
 	bezier = CubicBezier3d.new()
 
 func _physics_process(delta: float) -> void:
-	create_bez_pts()
-	generate_mesh()
+	clear_and_try_generate()
 
-func create_bez_pts():
+func clear_and_try_generate():
 	DebugDraw3D.clear_all()
+	var mesh = mesh_instance_3d.mesh as ArrayMesh
+	mesh.clear_surfaces()
+	
 	if !draw: return
 	
-	bezier = bezier.with_2_control_points(start, end)
+	assert(start, "No start point assigned")
+	assert(end, "No end point assigned")
 	
-	bez_ops.clear()
+	generate_bezier_ops()
+	
+	if draw_line_gizmo:
+		DebugDraw3D.draw_line_path(
+			bezier_ops.map(
+				func(op: OrientedPoint): return op.pos
+		))
+	
+	extrude(mesh, ExtrudeShape.circle_8(), bezier_ops)
+
+func generate_bezier_ops():
+	bezier.calc_for_2_control_points(start, end)
+	bezier_ops.clear()
 	for i in amnt:
 		var t = i as float/(amnt - 1) as float
 		var up: Vector3 = lerp(start.basis.y, end.basis.y, t)
 		var op: OrientedPoint = bezier.get_oriented_pt(t, up)
-		bez_ops.append(op)
-	
-	if draw_line_gizmo:
-		var arr: Array = bez_ops.map(func(op: OrientedPoint): return op.pos)
-		DebugDraw3D.draw_line_path(arr)
-
-
-func generate_mesh():
-	var mesh = mesh_instance_3d.mesh as ArrayMesh
-	mesh.clear_surfaces()
-	
-	if draw:
-		var shape = ExtrudeShape.circle_8()
-		extrude(mesh, shape, bez_ops)
+		bezier_ops.append(op)
 
 func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	var verts_in_shape: int = shape.vertex_count()
