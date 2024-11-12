@@ -6,7 +6,7 @@ class_name TubeSegment extends Node3D
 @export var amnt = 10
 @export var start: Node3D
 @export var end: Node3D
- 
+
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
 var bez_ops: Array[OrientedPoint] = []
 var bezier: CubicBezier3d
