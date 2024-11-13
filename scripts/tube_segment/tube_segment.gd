@@ -6,6 +6,9 @@ class_name TubeSegment extends Node3D
 @export var amnt = 10
 @export var start: Node3D
 @export var end: Node3D
+@export var body_material: StandardMaterial3D
+@export var start_edge_material: StandardMaterial3D
+@export var end_edge_material: StandardMaterial3D
  
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
 var bezier_ops: Array[OrientedPoint] = []
@@ -117,7 +120,8 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	surface_0_array[Mesh.ARRAY_INDEX]  = triangle_indices
 	mesh.resource_local_to_scene = true
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_0_array)
-	
+	if mesh.surface_get_material(0) != body_material:
+		mesh.surface_set_material(0, body_material)
 	
 	## last edge
 	edge(mesh, shape, path, true)
@@ -196,7 +200,12 @@ func edge(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint], is_f
 	surface_array[Mesh.ARRAY_NORMAL] = normals
 	surface_array[Mesh.ARRAY_INDEX]  = triangle_indices
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
-	
+
+	var surf_id = 1 if is_first else 2
+	var mat = start_edge_material if is_first else end_edge_material
+	if mesh.surface_get_material(surf_id) != mat:
+		mesh.surface_set_material(surf_id, mat)
+
 
 func square_with_center(mesh: ArrayMesh):
 	var my_vertices : Array[ExtrudeShape.Vertex] = \
