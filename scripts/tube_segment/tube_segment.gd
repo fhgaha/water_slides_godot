@@ -136,22 +136,23 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	#le_uvs             .resize(edge_vert_count)
 	
 	var last_op: OrientedPoint = path[edge_loops - 1]
-	for i in verts_in_shape - 1:
+	# vertss in shape: 16
+	for i in range(0, verts_in_shape - 2, 2): 
 		le_vertices.append(last_op.pos)
 		le_normals.append(last_op.rot.get_euler())
 		le_uvs.append(Vector2.DOWN)
-		
-		le_vertices.append(last_op.local_to_world(
-			Utils.vec2_extrude(shape.vertices[i].point)))
-		le_normals.append(last_op.local_to_world_direction(
-			Utils.vec2_extrude(shape.vertices[i].normal)))
-		le_uvs.append(Vector2(shape.vertices[i].u, 1.))
 		
 		le_vertices.append(last_op.local_to_world(
 			Utils.vec2_extrude(shape.vertices[i + 1].point)))
 		le_normals.append(last_op.local_to_world_direction(
 			Utils.vec2_extrude(shape.vertices[i + 1].normal)))
 		le_uvs.append(Vector2(shape.vertices[i + 1].u, 1.))
+		
+		le_vertices.append(last_op.local_to_world(
+			Utils.vec2_extrude(shape.vertices[i + 2].point)))
+		le_normals.append(last_op.local_to_world_direction(
+			Utils.vec2_extrude(shape.vertices[i + 2].normal)))
+		le_uvs.append(Vector2(shape.vertices[i + 2].u, 1.))
 	
 	for l in range(0, le_vertices.size(), 3):
 		le_triangle_indices.append_array([l, l+1, l+2])
@@ -159,6 +160,8 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	
 	prints("vertex:", le_vertices.size(), "uvs:", le_uvs.size(), \
 	"normals:", le_normals.size(), "indices:", le_triangle_indices.size())
+	# vertex: 21 uvs: 21 normals: 21 indices: 24
+	
 	var surface_1_array = []
 	surface_1_array.resize(Mesh.ARRAY_MAX)
 	surface_1_array[Mesh.ARRAY_VERTEX] = le_vertices
