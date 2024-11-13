@@ -14,8 +14,9 @@ var bezier: CubicBezier3d
 func _ready() -> void:
 	DebugDraw3D.scoped_config().set_thickness(0.1)
 	bezier = CubicBezier3d.new()
-	
+	# hack to make duplicates not reference each others children
 	mesh_instance_3d.mesh = mesh_instance_3d.mesh.duplicate()
+	
 	#set up mesh instance
 	#mesh_instance_3d = MeshInstance3D.new()
 	#add_child(mesh_instance_3d)
@@ -75,8 +76,8 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	normals         .resize(vert_count)
 	uvs             .resize(vert_count)
 	
-	var surface_array = []
-	surface_array.resize(Mesh.ARRAY_MAX)
+	var surface_0_array = []
+	surface_0_array.resize(Mesh.ARRAY_MAX)
 	
 	var look_up: Array[float] = []
 	look_up.resize(edge_loops)
@@ -88,16 +89,16 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 		var v_length: float = sample(look_up, (i as float) / edge_loops)
 		for j in verts_in_shape:
 			var id: int = offset + j
-			vertices.insert(
-				id, 
+			vertices.insert(id, 
 				path[i].local_to_world(
 					Utils.vec2_extrude(shape.vertices[j].point)
-			))
-			normals.insert(
-				id,
+				)
+			)
+			normals.insert(id,
 				path[i].local_to_world_direction(
 					Utils.vec2_extrude(shape.vertices[j].normal)
-			))
+				)
+			)
 			uvs.insert(id, Vector2(shape.vertices[j].u, v_length))
 	
 	var ti: int = 0
@@ -116,12 +117,222 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 			triangle_indices.set(ti, a); ti += 1;
 	
 	##array mesh
-	surface_array[Mesh.ARRAY_VERTEX] = vertices
+	surface_0_array[Mesh.ARRAY_VERTEX] = vertices
+	surface_0_array[Mesh.ARRAY_TEX_UV] = uvs
+	surface_0_array[Mesh.ARRAY_NORMAL] = normals
+	surface_0_array[Mesh.ARRAY_INDEX]  = triangle_indices
+	mesh.resource_local_to_scene = true
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_0_array)
+	
+	
+	## last edge
+	#var edge_vert_count: int = verts_in_shape + 1
+	#
+	#var le_triangle_indices = PackedInt32Array()  
+	#var le_vertices         = PackedVector3Array()
+	#var le_normals          = PackedVector3Array()
+	#var le_uvs              = PackedVector2Array()
+	#le_triangle_indices.resize(edge_vert_count * 3)
+	#le_vertices        .resize(edge_vert_count)
+	#le_normals         .resize(edge_vert_count)
+	#le_uvs             .resize(edge_vert_count)
+	#
+	#var last_op = path[edge_loops - 1]
+	#for i in verts_in_shape:
+		#le_vertices.insert(i, last_op.local_to_world(
+			#Utils.vec2_extrude(shape.vertices[i].point)))
+		#le_normals.insert(i, last_op.local_to_world_direction(
+			#Utils.vec2_extrude(shape.vertices[i].normal)))
+		#le_uvs.insert(i, Vector2(shape.vertices[i].u, 1.))
+	#
+	#
+	#
+	#var surface_1_array = []
+	#surface_1_array.resize(Mesh.ARRAY_MAX)
+	#surface_1_array[Mesh.ARRAY_VERTEX] = le_triangle_indices
+	#surface_1_array[Mesh.ARRAY_TEX_UV] = le_vertices
+	#surface_1_array[Mesh.ARRAY_NORMAL] = le_normals
+	#surface_1_array[Mesh.ARRAY_INDEX]  = le_uvs
+	#mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_1_array)
+	
+	#sphere(mesh)
+	#square(mesh)
+	square_with_center(mesh)
+
+func square_with_center(mesh: ArrayMesh):
+	var my_vertices : Array[ExtrudeShape.Vertex] = \
+	[
+		ExtrudeShape.Vertex.with_vals(Vector2(-1, 1), Vector2.UP, 0.1),
+		ExtrudeShape.Vertex.with_vals(Vector2( 1, 1), Vector2.UP, 0.1),
+		ExtrudeShape.Vertex.with_vals(Vector2( 1,-1), Vector2.UP, 0.1),
+		ExtrudeShape.Vertex.with_vals(Vector2(-1,-1), Vector2.UP, 0.1)
+	]
+	
+	var surface_array = []
+	surface_array.resize(Mesh.ARRAY_MAX)
+	var verts = PackedVector3Array()
+	var uvs = PackedVector2Array()
+	var normals = PackedVector3Array()
+	var indices = PackedInt32Array()
+	
+	var center = Vector3.ZERO
+	#for i in range(0, my_vertices.size() - 1):
+		#verts.append(center)
+		#normals.append(Vector3.FORWARD)
+		#uvs.append(Vector2.UP)
+		#
+		#verts.append(Utils.vec2_extrude(my_vertices[i].point))
+		#normals.append(Utils.vec2_extrude(my_vertices[i].normal))
+		#uvs.append(Vector2(my_vertices[i].u, 0))
+		#
+		#verts.append(Utils.vec2_extrude(my_vertices[i + 1].point))
+		#normals.append(Utils.vec2_extrude(my_vertices[i + 1].normal))
+		#uvs.append(Vector2(my_vertices[i].u, 0))
+	
+	#0
+	verts.append(center)
+	normals.append(Vector3.FORWARD)
+	uvs.append(Vector2.UP)
+	#1
+	verts.append(Utils.vec2_extrude(my_vertices[0].point))
+	normals.append(Utils.vec2_extrude(my_vertices[0].normal))
+	uvs.append(Vector2(my_vertices[0].u, 0))
+	#2
+	verts.append(Utils.vec2_extrude(my_vertices[1].point))
+	normals.append(Utils.vec2_extrude(my_vertices[1].normal))
+	uvs.append(Vector2(my_vertices[1].u, 0))
+	#3
+	verts.append(center)
+	normals.append(Vector3.FORWARD)
+	uvs.append(Vector2.UP)
+	#4
+	verts.append(Utils.vec2_extrude(my_vertices[1].point))
+	normals.append(Utils.vec2_extrude(my_vertices[1].normal))
+	uvs.append(Vector2(my_vertices[1].u, 0))
+	#5
+	verts.append(Utils.vec2_extrude(my_vertices[2].point))
+	normals.append(Utils.vec2_extrude(my_vertices[2].normal))
+	uvs.append(Vector2(my_vertices[2].u, 0))
+	#6
+	verts.append(center)
+	normals.append(Vector3.FORWARD)
+	uvs.append(Vector2.UP)
+	#7
+	verts.append(Utils.vec2_extrude(my_vertices[2].point))
+	normals.append(Utils.vec2_extrude(my_vertices[2].normal))
+	uvs.append(Vector2(my_vertices[2].u, 0))
+	#8
+	verts.append(Utils.vec2_extrude(my_vertices[3].point))
+	normals.append(Utils.vec2_extrude(my_vertices[3].normal))
+	uvs.append(Vector2(my_vertices[3].u, 0))
+	
+	indices.append_array([0, 1, 2])
+	indices.append_array([3, 4, 5])
+	indices.append_array([6, 7, 8])
+	indices.append_array([0, 8, 1]) # 0 and 6 are the same here
+	
+	surface_array[Mesh.ARRAY_VERTEX] = verts
 	surface_array[Mesh.ARRAY_TEX_UV] = uvs
 	surface_array[Mesh.ARRAY_NORMAL] = normals
-	surface_array[Mesh.ARRAY_INDEX]  = triangle_indices
-	mesh.resource_local_to_scene = true
+	surface_array[Mesh.ARRAY_INDEX] = indices
+	prints("vertex:", verts.size(), "uvs:", uvs.size(), \
+	"normals:", normals.size(), "indices:", indices.size())
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
+
+func square(mesh: ArrayMesh):
+	var surface_array = []
+	surface_array.resize(Mesh.ARRAY_MAX)
+
+	# PackedVector**Arrays for mesh construction.
+	var verts = PackedVector3Array()
+	var uvs = PackedVector2Array()
+	var normals = PackedVector3Array()
+	var indices = PackedInt32Array()
+	# 0
+	verts.append(Vector3(-1, 1, 0))
+	normals.append(Vector3.BACK)
+	uvs.append(Vector2.DOWN)
+	# 1
+	verts.append(Vector3(1, 1, 0))
+	normals.append(Vector3.BACK)
+	uvs.append(Vector2.DOWN)
+	# 2
+	verts.append(Vector3(1, -1, 0))
+	normals.append(Vector3.BACK)
+	uvs.append(Vector2.DOWN)
+	# 3
+	verts.append(Vector3(-1, -1, 0))
+	normals.append(Vector3.BACK)
+	uvs.append(Vector2.DOWN)
+	# tri 0, 1
+	indices.append_array([0, 1, 2])
+	indices.append_array([0, 2, 3])
+	
+	surface_array[Mesh.ARRAY_VERTEX] = verts
+	surface_array[Mesh.ARRAY_TEX_UV] = uvs
+	surface_array[Mesh.ARRAY_NORMAL] = normals
+	surface_array[Mesh.ARRAY_INDEX] = indices
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
+
+func sphere(mesh: ArrayMesh):
+	var surface_1_array = []
+	surface_1_array.resize(Mesh.ARRAY_MAX)
+
+	# PackedVector**Arrays for mesh construction.
+	var verts = PackedVector3Array()
+	var uvs = PackedVector2Array()
+	var normals = PackedVector3Array()
+	var indices = PackedInt32Array()
+
+	var rings = 50
+	var radial_segments = 50
+	var radius = 1
+
+	# Vertex indices.
+	var thisrow = 0
+	var prevrow = 0
+	var point = 0
+
+	# Loop over rings.
+	for i in range(rings + 1):
+		var v = float(i) / rings
+		var w = sin(PI * v)
+		var y = cos(PI * v)
+
+		# Loop over segments in ring.
+		for j in range(radial_segments + 1):
+			var u = float(j) / radial_segments
+			var x = sin(u * PI * 2.0)
+			var z = cos(u * PI * 2.0)
+			var vert = Vector3(x * radius * w, y * radius, z * radius * w)
+			verts.append(vert)
+			normals.append(vert.normalized())
+			uvs.append(Vector2(u, v))
+			point += 1
+
+			# Create triangles in ring using indices.
+			if i > 0 and j > 0:
+				indices.append(prevrow + j - 1)
+				indices.append(prevrow + j)
+				indices.append(thisrow + j - 1)
+
+				indices.append(prevrow + j)
+				indices.append(thisrow + j)
+				indices.append(thisrow + j - 1)
+
+		prevrow = thisrow
+		thisrow = point
+	
+
+	# Assign arrays to surface array.
+	surface_1_array[Mesh.ARRAY_VERTEX] = verts
+	surface_1_array[Mesh.ARRAY_TEX_UV] = uvs
+	surface_1_array[Mesh.ARRAY_NORMAL] = normals
+	surface_1_array[Mesh.ARRAY_INDEX] = indices
+
+	# Create mesh surface from mesh array.
+	# No blendshapes, lods, or compression used.
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_1_array)
 
 func get_length_approx() -> float:
 	const PRESCISION = 8

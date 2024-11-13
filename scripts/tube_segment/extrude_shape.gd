@@ -5,11 +5,12 @@ class Vertex:
 	var normal: Vector2
 	var u: float
 	
-	func with_vals(point: Vector2, normal: Vector2, u: float) -> Vertex:
-		self.point  = point
-		self.normal = normal
-		self.u      = u
-		return self
+	static func with_vals(point: Vector2, normal: Vector2, u: float) -> Vertex:
+		var v = Vertex.new()
+		v.point  = point
+		v.normal = normal
+		v.u      = u
+		return v
 
 var vertices: Array[Vertex]
 var line_indices: Array[int]
@@ -48,25 +49,24 @@ static func circle_8() -> ExtrudeShape:
 	const c23rd: float = cos(2./3. * PI/2.)
 	
 	return ExtrudeShape.new().with_vals( \
-		#vertices:
+		#vertices: point, normal, u
 		[ \
-			# TODO: set correct normals
-			Vertex.new().with_vals(Vector2(0.0, 1.0),       Vector2( s13rd,  c23rd), 	 1.000     ), \
-			Vertex.new().with_vals(Vector2(0., 1.),         Vector2(-s13rd,  c23rd), 	 0.125 * 0.), \
-			Vertex.new().with_vals(Vector2(-sqrt, sqrt),    Vector2(-s13rd,  c23rd), 	 0.125 * 1.), \
-			Vertex.new().with_vals(Vector2(-sqrt, sqrt),    Vector2(-s23rd,  c13rd), 	 0.125 * 1.), \
-			Vertex.new().with_vals(Vector2(-1., 0.),        Vector2(-s23rd,  c13rd), 	 0.125 * 2.), \
-			Vertex.new().with_vals(Vector2(-1., 0.),        Vector2(-s13rd, -c23rd), 	 0.125 * 2.), \
-			Vertex.new().with_vals(Vector2(-sqrt, -sqrt),   Vector2(-s13rd, -c23rd), 	 0.125 * 3.), \
-			Vertex.new().with_vals(Vector2(-sqrt, -sqrt),   Vector2(-s23rd, -c13rd), 	 0.125 * 3.), \
-			Vertex.new().with_vals(Vector2(0., -1.),        Vector2(-s23rd, -c13rd), 	 0.125 * 4.), \
-			Vertex.new().with_vals(Vector2(0., -1.),        Vector2( s13rd, -c23rd), 	 0.125 * 4.), \
-			Vertex.new().with_vals(Vector2(sqrt, -sqrt),    Vector2( s13rd, -c23rd), 	 0.125 * 5.), \
-			Vertex.new().with_vals(Vector2(sqrt, -sqrt),    Vector2( s23rd, -c13rd), 	 0.125 * 5.), \
-			Vertex.new().with_vals(Vector2(1., 0.),         Vector2( s23rd, -c13rd), 	 0.125 * 6.), \
-			Vertex.new().with_vals(Vector2(1., 0.),         Vector2( s23rd,  c13rd), 	 0.125 * 6.), \
-			Vertex.new().with_vals(Vector2(sqrt, sqrt),     Vector2( s23rd,  c13rd), 	 0.125 * 7.), \
-			Vertex.new().with_vals(Vector2(sqrt, sqrt),     Vector2( s13rd,  c23rd), 	 0.125 * 7.), \
+			Vertex.with_vals(Vector2(0.0, 1.0),       Vector2( s13rd,  c23rd), 	 1.000     ), \
+			Vertex.with_vals(Vector2(0., 1.),         Vector2(-s13rd,  c23rd), 	 0.125 * 0.), \
+			Vertex.with_vals(Vector2(-sqrt, sqrt),    Vector2(-s13rd,  c23rd), 	 0.125 * 1.), \
+			Vertex.with_vals(Vector2(-sqrt, sqrt),    Vector2(-s23rd,  c13rd), 	 0.125 * 1.), \
+			Vertex.with_vals(Vector2(-1., 0.),        Vector2(-s23rd,  c13rd), 	 0.125 * 2.), \
+			Vertex.with_vals(Vector2(-1., 0.),        Vector2(-s13rd, -c23rd), 	 0.125 * 2.), \
+			Vertex.with_vals(Vector2(-sqrt, -sqrt),   Vector2(-s13rd, -c23rd), 	 0.125 * 3.), \
+			Vertex.with_vals(Vector2(-sqrt, -sqrt),   Vector2(-s23rd, -c13rd), 	 0.125 * 3.), \
+			Vertex.with_vals(Vector2(0., -1.),        Vector2(-s23rd, -c13rd), 	 0.125 * 4.), \
+			Vertex.with_vals(Vector2(0., -1.),        Vector2( s13rd, -c23rd), 	 0.125 * 4.), \
+			Vertex.with_vals(Vector2(sqrt, -sqrt),    Vector2( s13rd, -c23rd), 	 0.125 * 5.), \
+			Vertex.with_vals(Vector2(sqrt, -sqrt),    Vector2( s23rd, -c13rd), 	 0.125 * 5.), \
+			Vertex.with_vals(Vector2(1., 0.),         Vector2( s23rd, -c13rd), 	 0.125 * 6.), \
+			Vertex.with_vals(Vector2(1., 0.),         Vector2( s23rd,  c13rd), 	 0.125 * 6.), \
+			Vertex.with_vals(Vector2(sqrt, sqrt),     Vector2( s23rd,  c13rd), 	 0.125 * 7.), \
+			Vertex.with_vals(Vector2(sqrt, sqrt),     Vector2( s13rd,  c23rd), 	 0.125 * 7.), \
 		],\
 		#line_indices: 
 		[ \
