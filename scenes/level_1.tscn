@@ -21,7 +21,7 @@ resource_local_to_scene = true
 albedo_texture = ExtResource("2_ad15c")
 uv1_scale = Vector3(1, 0.1, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_3uqmp"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_a0gdf"]
 resource_local_to_scene = true
 
 [node name="level_1" type="Node3D"]
@@ -48,7 +48,7 @@ end = NodePath("control_pts/end")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="tube_segment_0"]
 material_override = SubResource("StandardMaterial3D_on8bl")
-mesh = SubResource("ArrayMesh_3uqmp")
+mesh = SubResource("ArrayMesh_a0gdf")
 
 [node name="control_pts" type="Node" parent="tube_segment_0"]
 

@@ -30,9 +30,9 @@ func get_point(t: float) -> Vector3:
 	var omt2: float = omt * omt
 	var t2: float = t * t
 	return pts[0] * (omt2 * omt) + \
-		   pts[1] * (3. * omt2 * t) + \
-		   pts[2] * (3. * omt * t2) + \
-		   pts[3] * (t2 * t)
+			pts[1] * (3. * omt2 * t) + \
+			pts[2] * (3. * omt * t2) + \
+			pts[3] * (t2 * t)
 
 func get_tangent(pts: Array[Vector3], t: float) -> Vector3:
 	var omt: float = 1 - t
