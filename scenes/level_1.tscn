@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=4 uid="uid://d2vkkoebpn7nl"]
+[gd_scene load_steps=11 format=4 uid="uid://d2vkkoebpn7nl"]
 
 [ext_resource type="Script" path="res://scripts/tube_segment/tube_segment.gd" id="1_0naeh"]
 [ext_resource type="Texture2D" uid="uid://vvw05k6qshev" path="res://assets/img/stripes.png" id="2_sl535"]
+[ext_resource type="Script" path="res://scripts/tube_segment/oriented_point.gd" id="3_6fqvs"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_rk6jl"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -35,7 +36,7 @@ alpha_antialiasing_mode = 0
 shading_mode = 0
 albedo_color = Color(0.3094, 0.88998, 0.91, 0)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_foqxm"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_4apew"]
 resource_local_to_scene = true
 _surfaces = [{
 "aabb": AABB(0, 0, -2.5019, 16.6744, 16.6871, 12.7007),
@@ -99,13 +100,15 @@ start_edge_material = SubResource("StandardMaterial3D_of0s8")
 end_edge_material = SubResource("StandardMaterial3D_cwjml")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="tube_segment_0"]
-mesh = SubResource("ArrayMesh_foqxm")
+mesh = SubResource("ArrayMesh_4apew")
 metadata/_edit_lock_ = true
 
 [node name="control_pts" type="Node" parent="tube_segment_0"]
 
 [node name="start" type="Node3D" parent="tube_segment_0/control_pts"]
 transform = Transform3D(0.649793, 0, 2.28034, 0, 1, 0, -0.760111, 0, 1.94938, 16.0246, 15.6871, 0.433797)
+script = ExtResource("3_6fqvs")
 
 [node name="end" type="Node3D" parent="tube_segment_0/control_pts"]
 transform = Transform3D(-0.714473, 0, -2.09899, 0, 1, 0, 0.699663, 0, -2.14342, 11.5951, 7.13292, 9.49909)
+script = ExtResource("3_6fqvs")

@@ -4,8 +4,8 @@ class_name TubeSegment extends Node3D
 @export var draw: bool = false
 @export var draw_line_gizmo: bool = false
 @export var amnt = 10
-@export var start: Node3D
-@export var end: Node3D
+@export var start: ControlPoint
+@export var end: ControlPoint
 @export var body_material: StandardMaterial3D
 @export var start_edge_material: StandardMaterial3D
 @export var end_edge_material: StandardMaterial3D
