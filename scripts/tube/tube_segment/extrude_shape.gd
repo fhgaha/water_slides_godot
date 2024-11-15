@@ -38,7 +38,6 @@ func calc_u_span() -> float:
 
 static func circle_8() -> ExtrudeShape:
 	const sqrt: float = 1.0/sqrt(2.0)
-	var ang1 = sin(0)
 	# sin(0) = 0, sin(PI/2) = 1
 	# cos(0) = 1, cos(PI/2) = 0
 	# Vector2(0, 1) ~ Vector2(1, 0)
@@ -51,7 +50,7 @@ static func circle_8() -> ExtrudeShape:
 	return ExtrudeShape.new().with_vals( \
 		#vertices: point, normal, u
 		[ \
-			Vertex.with_vals(Vector2(0.0, 1.0),       Vector2( s13rd,  c23rd), 	 1.000     ), \
+			Vertex.with_vals(Vector2(0., 1.),         Vector2( s13rd,  c23rd), 	 1.000     ), \
 			Vertex.with_vals(Vector2(0., 1.),         Vector2(-s13rd,  c23rd), 	 0.125 * 0.), \
 			Vertex.with_vals(Vector2(-sqrt, sqrt),    Vector2(-s13rd,  c23rd), 	 0.125 * 1.), \
 			Vertex.with_vals(Vector2(-sqrt, sqrt),    Vector2(-s23rd,  c13rd), 	 0.125 * 1.), \

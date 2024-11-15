@@ -36,9 +36,6 @@ class_name TubeSegment extends Node3D
 		clear_and_try_generate()
 
 @export var body_material: StandardMaterial3D
-@export var start_edge_material: StandardMaterial3D
-@export var end_edge_material: StandardMaterial3D
-
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
 
 var bezier_ops: Array[OrientedPoint] = []
@@ -144,87 +141,12 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 		mesh.surface_set_material(0, body_material)
 	
 	## last edge
-	edge(mesh, shape, path, true)
-	edge(mesh, shape, path, false)
+	start.edge(shape, path, true)
+	end.edge(shape, path, false)
 
 	#sphere(mesh)
 	#square(mesh)
 	#square_with_center(mesh)
-
-func edge(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint], is_first: bool):
-	var verts_in_shape: int = shape.vertex_count()	#16
-	var edge_loops: int = path.size()
-	var edge_verts_amnt: int = (verts_in_shape - 1) / 2 * 3	# 21
-
-	var triangle_indices = PackedInt32Array()  
-	var vertices         = PackedVector3Array()
-	var normals          = PackedVector3Array()
-	var uvs              = PackedVector2Array()
-	triangle_indices.resize(edge_verts_amnt + 3)
-	vertices        .resize(edge_verts_amnt)
-	normals         .resize(edge_verts_amnt)
-	uvs             .resize(edge_verts_amnt)
-	
-	var base_op: OrientedPoint = path[0] if is_first else path[edge_loops - 1]
-	var ti: int = 0
-	var normal = base_op.rot.get_euler()
-	for i in range(0, verts_in_shape - 2, 2): 
-		vertices.set(ti, base_op.pos)
-		normals .set(ti, normal)
-		uvs     .set(ti, Vector2.DOWN)
-		ti += 1
-		var point: Vector3 = base_op.local_to_world(Utils.vec2_extrude(shape.vertices[i + 1].point))
-		# var normal: Vector3 = last_op.local_to_world_direction(Utils.vec2_extrude(shape.vertices[i + 1].normal))
-		vertices.set(ti, point)
-		normals .set(ti, normal)
-		uvs     .set(ti, Vector2(shape.vertices[i + 1].u, 1.))
-		ti += 1
-		point = base_op.local_to_world(Utils.vec2_extrude(shape.vertices[i + 2].point))
-		# normal = last_op.local_to_world_direction(Utils.vec2_extrude(shape.vertices[i + 2].normal))
-		vertices.set(ti, point)
-		normals .set(ti, normal)
-		uvs     .set(ti, Vector2(shape.vertices[i + 2].u, 1.))
-		ti += 1
-
-	ti = 0
-	if is_first:
-		for l in range(0, edge_verts_amnt, 3):
-			triangle_indices.set(ti, l  ); ti += 1;
-			triangle_indices.set(ti, l+2); ti += 1;
-			triangle_indices.set(ti, l+1); ti += 1;
-
-		# last triangle
-		triangle_indices.set(ti, 0                     ); ti += 1;
-		triangle_indices.set(ti, 1                     ); ti += 1;
-		triangle_indices.set(ti, edge_verts_amnt - 1); ti += 1;
-	else:
-		for l in range(0, edge_verts_amnt, 3):
-			triangle_indices.set(ti, l  ); ti += 1;
-			triangle_indices.set(ti, l+1); ti += 1;
-			triangle_indices.set(ti, l+2); ti += 1;
-
-		# last triangle
-		triangle_indices.set(ti, 0                     ); ti += 1;
-		triangle_indices.set(ti, edge_verts_amnt - 1); ti += 1;
-		triangle_indices.set(ti, 1                     ); ti += 1;
-	
-
-	# prints("vertex:", le_vertices.size(), "uvs:", le_uvs.size(), \
-	# "normals:", le_normals.size(), "indices:", le_triangle_indices.size())
-	# vertex: 21 uvs: 21 normals: 21 indices: 24
-	
-	var surface_array = []
-	surface_array.resize(Mesh.ARRAY_MAX)
-	surface_array[Mesh.ARRAY_VERTEX] = vertices
-	surface_array[Mesh.ARRAY_TEX_UV] = uvs
-	surface_array[Mesh.ARRAY_NORMAL] = normals
-	surface_array[Mesh.ARRAY_INDEX]  = triangle_indices
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
-
-	var surf_id = 1 if is_first else 2
-	var mat = start_edge_material if is_first else end_edge_material
-	if mesh.surface_get_material(surf_id) != mat:
-		mesh.surface_set_material(surf_id, mat)
 
 
 func square_with_center(mesh: ArrayMesh):
