@@ -15,15 +15,25 @@ class_name TubeSegment extends Node3D
 
 @export var start: ControlPoint:
 	set(value):
-		start = value
 		if value:
-			clear_and_try_generate()
+			start = value
+			assert(start != end, "start is set but its equal to end!")
+			start.local_transform_changed.connect(_on_control_pt_transform_changed)
+		else:
+			start.disconnect(StringName("local_transform_changed"), _on_control_pt_transform_changed)
+			start = value
+		clear_and_try_generate()
 
 @export var end: ControlPoint:
 	set(value):
-		end = value
 		if value:
-			clear_and_try_generate()
+			end = value
+			assert(start != end, "end is set but its equal to start!")
+			end.local_transform_changed.connect(_on_control_pt_transform_changed)
+		else:
+			end.disconnect(StringName("local_transform_changed"), _on_control_pt_transform_changed)
+			end = value
+		clear_and_try_generate()
 
 @export var body_material: StandardMaterial3D
 @export var start_edge_material: StandardMaterial3D
@@ -40,12 +50,6 @@ func _ready() -> void:
 	# hack to make duplicates not reference each others children
 	mesh_instance_3d.mesh = mesh_instance_3d.mesh.duplicate()
 
-	start.local_transform_changed.connect(_on_control_pt_transform_changed)
-	end.local_transform_changed.connect(_on_control_pt_transform_changed)
-
-func _physics_process(delta: float) -> void:
-	# clear_and_try_generate()
-	pass
 
 func clear_and_try_generate():
 	if !is_node_ready(): await ready
