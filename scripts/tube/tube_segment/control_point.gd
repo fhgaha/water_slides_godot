@@ -17,6 +17,8 @@ var state = ControlPointState.None
 
 func _ready():
 	set_notify_local_transform(true)
+	var mesh = mesh_instance.mesh as ArrayMesh
+	mesh.clear_surfaces()
 
 func _notification(what: int) -> void:
 	if what == Node3D.NOTIFICATION_LOCAL_TRANSFORM_CHANGED:
@@ -29,7 +31,11 @@ func hide_edge():
 	mesh_instance.hide()
 
 func edge(shape: ExtrudeShape, path: Array[OrientedPoint], is_first: bool):
+	if !is_node_ready(): await ready
 	var mesh = mesh_instance.mesh as ArrayMesh
+	if mesh.get_surface_count() != 0: return
+
+	prints(name, "generating!")
 	mesh.clear_surfaces()
 	
 	var verts_in_shape: int = shape.vertex_count()	#16

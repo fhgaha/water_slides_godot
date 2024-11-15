@@ -2,4 +2,7 @@ Maybe
 - control points scaling should depend on tube length
 - amnt should depend on tube length
 - generate tube edge transparent thing for interaction
-  
+
+
+
+- use scaler instead of cp scale z
