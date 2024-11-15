@@ -12,6 +12,11 @@ enum ControlPointState {None, Drag}
 		if display:	show_edge() 
 		else: hide_edge()
 
+@export var nearest_cp_offest: float = 3.:
+	set(value):
+		nearest_cp_offest = value
+		local_transform_changed.emit(self)
+
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
 var state = ControlPointState.None
 
