@@ -1,16 +1,36 @@
 @tool
 class_name TubeSegment extends Node3D
 
-@export var draw: bool = false
+@export var draw: bool = false:
+	set(value):
+		draw = value
+		clear_and_try_generate()
+
 @export var draw_line_gizmo: bool = false
-@export var amnt = 10
-@export var start: ControlPoint
-@export var end: ControlPoint
+
+@export var amnt: int = 10:
+	set(value):
+		amnt = value
+		clear_and_try_generate()
+
+@export var start: ControlPoint:
+	set(value):
+		start = value
+		if value:
+			clear_and_try_generate()
+
+@export var end: ControlPoint:
+	set(value):
+		end = value
+		if value:
+			clear_and_try_generate()
+
 @export var body_material: StandardMaterial3D
 @export var start_edge_material: StandardMaterial3D
 @export var end_edge_material: StandardMaterial3D
- 
+
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
+
 var bezier_ops: Array[OrientedPoint] = []
 var bezier: CubicBezier3d
 
@@ -19,21 +39,17 @@ func _ready() -> void:
 	bezier = CubicBezier3d.new()
 	# hack to make duplicates not reference each others children
 	mesh_instance_3d.mesh = mesh_instance_3d.mesh.duplicate()
-	
-	#set up mesh instance
-	#mesh_instance_3d = MeshInstance3D.new()
-	#add_child(mesh_instance_3d)
-	#mesh_instance_3d.mesh = ArrayMesh.new()
-	#mesh_instance_3d.mesh.resource_local_to_scene = true
-	#var mat = StandardMaterial3D.new()
-	#mat.albedo_texture = load("res://assets/img/stripes.png")
-	#mat.uv1_scale = Vector3(1., 0.1, 1.)
-	#mesh_instance_3d.material_override = mat
+
+	start.local_transform_changed.connect(_on_control_pt_transform_changed)
+	end.local_transform_changed.connect(_on_control_pt_transform_changed)
 
 func _physics_process(delta: float) -> void:
-	clear_and_try_generate()
+	# clear_and_try_generate()
+	pass
 
 func clear_and_try_generate():
+	if !is_node_ready(): await ready
+
 	DebugDraw3D.clear_all()
 	var mesh = mesh_instance_3d.mesh as ArrayMesh
 	mesh.clear_surfaces()
@@ -388,13 +404,13 @@ func get_length_approx() -> float:
 	return dist
 
 #Create a lookup-table containing cumulative point distances
-func calc_length_table_into(to_fill: Array[float], bezier: CubicBezier3d):
+func calc_length_table_into(to_fill: Array[float], bezier_obj: CubicBezier3d):
 	to_fill[0] = 0.
 	var total_length: float = 0.
-	var prev: Vector3 = bezier.pts[0]
+	var prev: Vector3 = bezier_obj.pts[0]
 	for i in to_fill.size():
 		var t: float = (i as float)/(to_fill.size() - 1)
-		var pt: Vector3 = bezier.get_point(t)
+		var pt: Vector3 = bezier_obj.get_point(t)
 		var diff: float = (prev - pt).length()
 		total_length += diff
 		to_fill[i] = total_length
@@ -416,3 +432,9 @@ func sample(f_arr: Array[float], t: float) -> float:
 	if id_lower < 0:
 		return f_arr[0]
 	return lerpf(f_arr[id_lower], f_arr[id_upper], i_float - id_lower)
+
+
+func _on_control_pt_transform_changed(sender: ControlPoint):
+	# prints(sender.name, "child's local transform has changed!")
+	clear_and_try_generate()
+	pass

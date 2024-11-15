@@ -3,6 +3,8 @@ class_name ControlPoint extends Node3D
 
 enum ControlPointState {None, Drag}
 
+signal local_transform_changed(sender: ControlPoint)
+
 var state = ControlPointState.None
 
 func _ready():
@@ -10,5 +12,5 @@ func _ready():
 
 func _notification(what: int) -> void:
 	if what == Node3D.NOTIFICATION_LOCAL_TRANSFORM_CHANGED:
-		prints(self.name, "Local transform has changed!")
+		local_transform_changed.emit(self)
 	pass
