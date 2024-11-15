@@ -9,11 +9,14 @@ func with_4_control_points(arr: Array[Vector3]) -> CubicBezier3d:
 	return self
 
 func with_2_control_points(start: Node3D, end: Node3D) -> CubicBezier3d:
+	calc_for_2_control_points(start, end)
+	return self
+
+func calc_for_2_control_points(start: Node3D, end: Node3D):
 	pts[0] = start.position
 	pts[1] = start.to_global(Vector3.FORWARD * start.scale.z)
 	pts[2] = end.to_global(Vector3.BACK * end.scale.z)
 	pts[3] = end.position
-	return self
 
 func get_point(t: float) -> Vector3:
 	#var a: Vector3 = lerp(pts[0], pts[1], t)
@@ -27,9 +30,9 @@ func get_point(t: float) -> Vector3:
 	var omt2: float = omt * omt
 	var t2: float = t * t
 	return pts[0] * (omt2 * omt) + \
-		   pts[1] * (3. * omt2 * t) + \
-		   pts[2] * (3. * omt * t2) + \
-		   pts[3] * (t2 * t)
+			pts[1] * (3. * omt2 * t) + \
+			pts[2] * (3. * omt * t2) + \
+			pts[3] * (t2 * t)
 
 func get_tangent(pts: Array[Vector3], t: float) -> Vector3:
 	var omt: float = 1 - t
