@@ -48,8 +48,8 @@ func edge(shape: ExtrudeShape, path: Array[OrientedPoint], is_first: bool):
 	var base_op: OrientedPoint = path[0] if is_first else path[edge_loops - 1]
 	base_op.pos = Vector3.ZERO
 	var idx: int = 0
-	# var normal = base_op.rot.get_euler()
-	var normal: Vector3 = transform.basis.z
+	var normal = base_op.rot.get_euler()
+	# var normal: Vector3 = self.rotation
 
 	for i in range(0, verts_in_shape - 2, 2): 
 		vertices.set(idx, base_op.pos)
