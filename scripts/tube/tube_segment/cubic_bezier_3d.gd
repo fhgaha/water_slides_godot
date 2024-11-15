@@ -14,8 +14,8 @@ func with_2_control_points(start: ControlPoint, end: ControlPoint) -> CubicBezie
 
 func calc_for_2_control_points(start: ControlPoint, end: ControlPoint):
 	pts[0] = start.position
-	pts[1] = start.to_global(Vector3.FORWARD * start.nearest_cp_offest)
-	pts[2] = end.to_global(Vector3.BACK * end.nearest_cp_offest)
+	pts[1] = start.to_global(Vector3.FORWARD * start.nearest_cp_z_offest)
+	pts[2] = end.to_global(Vector3.BACK * end.nearest_cp_z_offest)
 	pts[3] = end.position
 
 func get_point(t: float) -> Vector3:

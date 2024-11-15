@@ -1,9 +1,7 @@
 @tool
 class_name ControlPoint extends Node3D
 
-signal local_transform_changed(sender: ControlPoint)
-
-enum ControlPointState {None, Drag}
+signal regenerate_segment_request(sender: ControlPoint)
 
 @export var display: bool:
 	set(value):
@@ -12,13 +10,12 @@ enum ControlPointState {None, Drag}
 		if display:	show_edge() 
 		else: hide_edge()
 
-@export var nearest_cp_offest: float = 3.:
+@export var nearest_cp_z_offest: float = 3.:
 	set(value):
-		nearest_cp_offest = value
-		local_transform_changed.emit(self)
+		nearest_cp_z_offest = value
+		regenerate_segment_request.emit(self)
 
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
-var state = ControlPointState.None
 
 func _ready():
 	set_notify_local_transform(true)
@@ -27,7 +24,7 @@ func _ready():
 
 func _notification(what: int) -> void:
 	if what == Node3D.NOTIFICATION_LOCAL_TRANSFORM_CHANGED:
-		local_transform_changed.emit(self)
+		regenerate_segment_request.emit(self)
 
 func show_edge():
 	mesh_instance.show()
@@ -40,7 +37,6 @@ func edge(shape: ExtrudeShape, path: Array[OrientedPoint], is_first: bool):
 	var mesh = mesh_instance.mesh as ArrayMesh
 	if mesh.get_surface_count() != 0: return
 
-	prints(name, "generating!")
 	mesh.clear_surfaces()
 	
 	var verts_in_shape: int = shape.vertex_count()	#16
@@ -57,26 +53,21 @@ func edge(shape: ExtrudeShape, path: Array[OrientedPoint], is_first: bool):
 	uvs             .resize(edge_verts_amnt)
 	
 	var base_op: OrientedPoint = path[0] if is_first else path[edge_loops - 1]
-	base_op.pos = Vector3.ZERO
 	var idx: int = 0
 	var normal = base_op.rot.get_euler()
 	# var normal: Vector3 = self.rotation
 
 	for i in range(0, verts_in_shape - 2, 2): 
-		vertices.set(idx, base_op.pos)
+		vertices.set(idx, Vector3.ZERO)
 		normals .set(idx, normal)
 		uvs     .set(idx, Vector2.DOWN)
 		idx += 1
-		# var point: Vector3 = base_op.local_to_world(Utils.vec2_extrude(shape.vertices[i + 1].point))
 		var point: Vector3 = Utils.vec2_extrude(shape.vertices[i + 1].point)
-		# var normal: Vector3 = last_op.local_to_world_direction(Utils.vec2_extrude(shape.vertices[i + 1].normal))
 		vertices.set(idx, point)
 		normals .set(idx, normal)
 		uvs     .set(idx, Vector2(shape.vertices[i + 1].u, 1.))
 		idx += 1
-		# point = base_op.local_to_world(Utils.vec2_extrude(shape.vertices[i + 2].point))
 		point = Utils.vec2_extrude(shape.vertices[i + 2].point)
-		# normal = last_op.local_to_world_direction(Utils.vec2_extrude(shape.vertices[i + 2].normal))
 		vertices.set(idx, point)
 		normals .set(idx, normal)
 		uvs     .set(idx, Vector2(shape.vertices[i + 2].u, 1.))

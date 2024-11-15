@@ -18,7 +18,7 @@ class_name TubeSegment extends Node3D
 		if value:
 			start = value
 			assert(start != end, "start is set but its equal to end!")
-			start.local_transform_changed.connect(_on_control_pt_transform_changed)
+			start.regenerate_segment_request.connect(_on_control_pt_transform_changed)
 		else:
 			start.disconnect(StringName("local_transform_changed"), _on_control_pt_transform_changed)
 			start = value
@@ -29,7 +29,7 @@ class_name TubeSegment extends Node3D
 		if value:
 			end = value
 			assert(start != end, "end is set but its equal to start!")
-			end.local_transform_changed.connect(_on_control_pt_transform_changed)
+			end.regenerate_segment_request.connect(_on_control_pt_transform_changed)
 		else:
 			end.disconnect(StringName("local_transform_changed"), _on_control_pt_transform_changed)
 			end = value
@@ -68,7 +68,15 @@ func clear_and_try_generate():
 				func(op: OrientedPoint): return op.pos
 		))
 	
-	extrude(mesh, ExtrudeShape.circle_8(), bezier_ops)
+	var shape = ExtrudeShape.circle_8()
+	extrude(mesh, shape, bezier_ops)
+	start.edge(shape, bezier_ops, true)
+	end.edge(shape, bezier_ops, false)
+
+	#sphere(mesh)
+	#square(mesh)
+	#square_with_center(mesh)
+
 
 func generate_bezier_ops():
 	bezier.calc_for_2_control_points(start, end)
@@ -139,14 +147,6 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_0_array)
 	if mesh.surface_get_material(0) != body_material:
 		mesh.surface_set_material(0, body_material)
-	
-	## last edge
-	start.edge(shape, path, true)
-	end.edge(shape, path, false)
-
-	#sphere(mesh)
-	#square(mesh)
-	#square_with_center(mesh)
 
 
 func square_with_center(mesh: ArrayMesh):
