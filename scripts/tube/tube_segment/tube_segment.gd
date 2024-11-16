@@ -8,9 +8,11 @@ class_name TubeSegment extends Node3D
 
 @export var draw_line_gizmo: bool = false
 
-@export var amnt: int = 10:
+@export var amnt: int
+
+@export_range(0.1, 100.) var dist_between_rings: float = 1.:
 	set(value):
-		amnt = value
+		dist_between_rings = value
 		clear_and_try_generate()
 
 @export var start: ControlPoint:
@@ -79,13 +81,18 @@ func clear_and_try_generate():
 
 
 func generate_bezier_ops():
+	amnt = (start.position - end.position).length() / dist_between_rings as int
+	if amnt < 2: amnt = 2
+
 	bezier.calc_for_2_control_points(start, end)
 	bezier_ops.clear()
+	
 	for i in amnt:
 		var t = i as float/(amnt - 1) as float
 		var up: Vector3 = lerp(start.basis.y, end.basis.y, t)
 		var op: OrientedPoint = bezier.get_oriented_pt(t, up)
 		bezier_ops.append(op)
+
 
 func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	var verts_in_shape: int = shape.vertex_count()	#16
