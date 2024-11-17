@@ -8,36 +8,18 @@ class_name TubeSegment extends Node3D
 
 @export var draw_line_gizmo: bool = false
 
-@export var amnt: int
-
 @export_range(0.1, 100.) var dist_between_rings: float = 1.:
 	set(value):
 		dist_between_rings = value
 		clear_and_try_generate()
 
-@export var start: ControlPoint:
-	set(value):
-		if value:
-			start = value
-			assert(start != end, "start is set but its equal to end!")
-			start.regenerate_segment_request.connect(_on_control_pt_transform_changed)
-		else:
-			start.disconnect(StringName("local_transform_changed"), _on_control_pt_transform_changed)
-			start = value
-		clear_and_try_generate()
-
-@export var end: ControlPoint:
-	set(value):
-		if value:
-			end = value
-			assert(start != end, "end is set but its equal to start!")
-			end.regenerate_segment_request.connect(_on_control_pt_transform_changed)
-		else:
-			end.disconnect(StringName("local_transform_changed"), _on_control_pt_transform_changed)
-			end = value
-		clear_and_try_generate()
-
 @export var body_material: StandardMaterial3D
+
+@export_category("do not change in editor")
+@export var ring_amnt: int
+@export var start: ControlPoint
+@export var end: ControlPoint
+
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
 
 var bezier_ops: Array[OrientedPoint] = []
@@ -48,6 +30,14 @@ func _ready() -> void:
 	bezier = CubicBezier3d.new()
 	# hack to make duplicates not reference each others children
 	mesh_instance_3d.mesh = mesh_instance_3d.mesh.duplicate()
+
+	start = $control_pts/start
+	start.regenerate_segment_request.connect(_on_control_pt_transform_changed)
+
+	end = $control_pts/end
+	end.regenerate_segment_request.connect(_on_control_pt_transform_changed)
+
+	clear_and_try_generate()
 
 
 func clear_and_try_generate():
@@ -81,14 +71,14 @@ func clear_and_try_generate():
 
 
 func generate_bezier_ops():
-	amnt = (start.position - end.position).length() / dist_between_rings as int
-	if amnt < 2: amnt = 2
+	ring_amnt = (start.position - end.position).length() / dist_between_rings as int
+	if ring_amnt < 2: ring_amnt = 2
 
 	bezier.calc_for_2_control_points(start, end)
 	bezier_ops.clear()
 	
-	for i in amnt:
-		var t = i as float/(amnt - 1) as float
+	for i in ring_amnt:
+		var t = i as float/(ring_amnt - 1) as float
 		var up: Vector3 = lerp(start.basis.y, end.basis.y, t)
 		var op: OrientedPoint = bezier.get_oriented_pt(t, up)
 		bezier_ops.append(op)
