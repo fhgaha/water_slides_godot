@@ -37,8 +37,6 @@ func _ready() -> void:
 	end = $control_pts/end
 	end.regenerate_segment_request.connect(_on_control_pt_transform_changed)
 
-	clear_and_try_generate()
-
 
 func clear_and_try_generate():
 	if !is_node_ready(): await ready
@@ -63,8 +61,8 @@ func clear_and_try_generate():
 	
 	var shape = ExtrudeShape.circle_8()
 	extrude(mesh, shape, bezier_ops)
-	start.edge(shape, bezier_ops, true)
-	end.edge(shape, bezier_ops, false)
+	start.edge(shape, bezier_ops)
+	end.edge(shape, bezier_ops)
 
 	#sphere(mesh)
 	#square(mesh)

@@ -24,10 +24,17 @@ func show_edge():
 func hide_edge():
 	mesh_instance.hide()
 
-func edge(shape: ExtrudeShape, path: Array[OrientedPoint], is_first: bool):
+
+func edge(shape: ExtrudeShape, path: Array[OrientedPoint]):
 	if !is_node_ready(): await ready
 	var mesh = mesh_instance.mesh as ArrayMesh
 	if mesh.get_surface_count() != 0: return
+	
+	var is_start: bool 
+	match name:
+		"start": is_start = true
+		"end": is_start = false
+		_:	push_error("Name should be either start or end!: %s" % name)
 
 	mesh.clear_surfaces()
 	
@@ -44,7 +51,7 @@ func edge(shape: ExtrudeShape, path: Array[OrientedPoint], is_first: bool):
 	normals         .resize(edge_verts_amnt)
 	uvs             .resize(edge_verts_amnt)
 	
-	var base_op: OrientedPoint = path[0] if is_first else path[edge_loops - 1]
+	var base_op: OrientedPoint = path[0] if is_start else path[edge_loops - 1]
 	var idx: int = 0
 	var normal = base_op.rot.get_euler()
 	# var normal: Vector3 = self.rotation
@@ -66,7 +73,7 @@ func edge(shape: ExtrudeShape, path: Array[OrientedPoint], is_first: bool):
 		idx += 1
 
 	idx = 0
-	if is_first:
+	if is_start:
 		for l in range(0, edge_verts_amnt, 3):
 			triangle_indices.set(idx, l  ); idx += 1;
 			triangle_indices.set(idx, l+2); idx += 1;	# flip if not is_first

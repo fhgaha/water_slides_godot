@@ -8,3 +8,6 @@ Maybe
 
 Noted
 - should not change segment positions, only start and end positions i guess
+
+Issues
+- spawned tubes are generated 4 times. no good. @export gets called on node creation i guess
