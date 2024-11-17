@@ -17,14 +17,6 @@ signal regenerate_segment_request(sender: ControlPoint)
 
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
 
-func _ready():
-	set_notify_local_transform(true)
-	var mesh = mesh_instance.mesh as ArrayMesh
-	mesh.clear_surfaces()
-
-func _notification(what: int) -> void:
-	if what == Node3D.NOTIFICATION_LOCAL_TRANSFORM_CHANGED:
-		regenerate_segment_request.emit(self)
 
 func show_edge():
 	mesh_instance.show()
@@ -106,3 +98,16 @@ func edge(shape: ExtrudeShape, path: Array[OrientedPoint], is_first: bool):
 	surface_array[Mesh.ARRAY_NORMAL] = normals
 	surface_array[Mesh.ARRAY_INDEX]  = triangle_indices
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
+
+
+func _ready():
+	set_notify_local_transform(true)
+	var mesh = mesh_instance.mesh as ArrayMesh
+	mesh.clear_surfaces()
+
+	var raycast_target = $raycast_trg as ControlPointRaycastTarget
+	raycast_target.register_contol_point(self)
+
+func _notification(what: int) -> void:
+	if what == Node3D.NOTIFICATION_LOCAL_TRANSFORM_CHANGED:
+		regenerate_segment_request.emit(self)
