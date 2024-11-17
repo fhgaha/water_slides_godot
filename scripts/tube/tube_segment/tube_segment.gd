@@ -1,7 +1,7 @@
 @tool
 class_name TubeSegment extends Node3D
 
-@export var draw: bool = false:
+@export var draw: bool = true:
 	set(value):
 		draw = value
 		clear_and_try_generate()
@@ -52,6 +52,7 @@ func clear_and_try_generate():
 	assert(start, "%s: No start point assigned" % name)
 	assert(end, "%s: No end point assigned" % name)
 	
+	prints(self.name, ": generating!")
 	generate_bezier_ops()
 	
 	if draw_line_gizmo:

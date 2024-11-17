@@ -40,4 +40,6 @@ omni_range = 261.112
 script = ExtResource("1_3cr4x")
 cam = NodePath("../cam_controller")
 
-[node name="tube_segment_0" parent="tube_0" instance=ExtResource("3_gufkc")]
+[node name="segments" type="Node3D" parent="tube_0"]
+
+[node name="tube_segment_0" parent="tube_0/segments" instance=ExtResource("3_gufkc")]

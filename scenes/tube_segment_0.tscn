@@ -10,7 +10,7 @@ cull_mode = 2
 albedo_texture = ExtResource("2_0dnd6")
 uv1_scale = Vector3(1, 0.1, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_jrosq"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_kygyw"]
 resource_local_to_scene = true
 _surfaces = [{
 "aabb": AABB(-1, 0, -10, 2, 21, 10),
@@ -69,7 +69,6 @@ points = PackedVector3Array(0, 1, 0, 0.70693, 0.70693, 0, -0.707126, 0.70693, 0,
 
 [node name="tube_segment_0" type="Node3D" node_paths=PackedStringArray("start", "end")]
 script = ExtResource("1_ysdma")
-draw = true
 dist_between_rings = 1.6
 body_material = SubResource("StandardMaterial3D_4ipd3")
 ring_amnt = 8
@@ -77,7 +76,7 @@ start = NodePath("control_pts/start")
 end = NodePath("control_pts/end")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("ArrayMesh_jrosq")
+mesh = SubResource("ArrayMesh_kygyw")
 metadata/_edit_lock_ = true
 
 [node name="control_pts" type="Node3D" parent="."]
