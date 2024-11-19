@@ -10,7 +10,7 @@ cull_mode = 2
 albedo_texture = ExtResource("2_0dnd6")
 uv1_scale = Vector3(1, 0.1, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_loxn5"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_75o6y"]
 resource_local_to_scene = true
 _surfaces = [{
 "aabb": AABB(-1, 0, -10, 2, 21, 10),
@@ -76,7 +76,7 @@ start = NodePath("control_pts/start")
 end = NodePath("control_pts/end")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("ArrayMesh_loxn5")
+mesh = SubResource("ArrayMesh_75o6y")
 metadata/_edit_lock_ = true
 
 [node name="control_pts" type="Node3D" parent="."]
@@ -92,7 +92,8 @@ material_override = SubResource("StandardMaterial3D_dtgnq")
 mesh = SubResource("ArrayMesh_184jb")
 metadata/_edit_lock_ = true
 
-[node name="raycast_trg" type="AnimatableBody3D" parent="control_pts/start"]
+[node name="raycast_trg" type="Area3D" parent="control_pts/start"]
+monitorable = false
 script = ExtResource("4_p0jx5")
 metadata/_edit_lock_ = true
 
@@ -110,8 +111,9 @@ material_override = SubResource("StandardMaterial3D_3m5cg")
 mesh = SubResource("ArrayMesh_uh3s6")
 metadata/_edit_lock_ = true
 
-[node name="raycast_trg" type="AnimatableBody3D" parent="control_pts/end"]
+[node name="raycast_trg" type="Area3D" parent="control_pts/end"]
 transform = Transform3D(1, 1.49012e-08, 2.98023e-08, 0, 1, 0, 0, 2.98023e-08, 1, 0, 0, 0)
+monitorable = false
 script = ExtResource("4_p0jx5")
 metadata/_edit_lock_ = true
 

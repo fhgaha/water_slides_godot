@@ -1,5 +1,5 @@
 @tool
-class_name ControlPointRaycastTarget extends AnimatableBody3D
+class_name ControlPointRaycastTarget extends Area3D
 
 var cp_parent: ControlPoint
 

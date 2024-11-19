@@ -115,6 +115,32 @@ func _ready():
 	var raycast_target = $raycast_trg as ControlPointRaycastTarget
 	raycast_target.register_contol_point(self)
 
+	hide_edge()
+
+	raycast_target.mouse_entered.connect(show_edge)
+	raycast_target.mouse_exited.connect(hide_edge)
+
+	raycast_target.input_event.connect(_on_raycast_trg_input_event)
+
+
 func _notification(what: int) -> void:
 	if what == Node3D.NOTIFICATION_LOCAL_TRANSFORM_CHANGED:
 		regenerate_segment_request.emit(self)
+
+
+func _on_raycast_trg_input_event(
+	camera: Node, 
+	event: InputEvent, 
+	event_position: Vector3, 
+	normal: Vector3, 
+	shape_idx: int
+):
+	if event is InputEventMouseButton && event.pressed && event.button_index == MOUSE_BUTTON_LEFT:
+		prints(
+			"camera:", camera,
+			"event:", event,
+			"event_position:", event_position,
+			"normal:", normal, 
+			"shape_idx:", shape_idx
+		)
+	pass

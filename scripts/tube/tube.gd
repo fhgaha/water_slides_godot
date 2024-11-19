@@ -46,6 +46,7 @@ func react_to_lmb_when_idle(event: InputEvent):
 		build_state = BuildState.Building
 		action_queue.append(react_to_mouse_motion_when_building.bind(event))
 
+		# cube spawn
 		# var mesh_inst = MeshInstance3D.new()
 		# mesh_inst.mesh = BoxMesh.new()
 		# add_child(mesh_inst)
@@ -85,12 +86,11 @@ func spawn_new_segm(spawn_global_pos: Vector3) -> TubeSegment:
 
 
 func _physics_process(_delta):
-	# update_in_physics_process()
+	update_in_physics_process()
 
 	pass
 
 
-# shit still doesnt work
 func update_in_physics_process():
 	match build_state:
 		BuildState.Idle:
@@ -99,6 +99,7 @@ func update_in_physics_process():
 				var result: Dictionary = cam.raycast(mouse_screen_position)
 				prints("result:", result)
 				if result && result.collider is ControlPointRaycastTarget:
+					# raycasted succsessfully
 					var cp_rc_trg = result.collider as ControlPointRaycastTarget
 					prints("found raycast target:", cp_rc_trg)
 
