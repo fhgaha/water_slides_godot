@@ -1,6 +1,9 @@
 @tool
 class_name TubeSegment extends Node3D
 
+signal start_was_lmb_clicked(sender: TubeSegment, start: ControlPoint, data: ControlPoint.InputEventData)
+signal end_was_lmb_clicked(sender: TubeSegment, end: ControlPoint, data: ControlPoint.InputEventData)
+
 @export var draw: bool = true:
 	set(value):
 		draw = value
@@ -33,9 +36,11 @@ func _ready() -> void:
 
 	start = $control_pts/start
 	start.regenerate_segment_request.connect(_on_control_pt_transform_changed)
+	start.was_lmb_clicked.connect(_on_start_was_lmb_clicked)
 
 	end = $control_pts/end
 	end.regenerate_segment_request.connect(_on_control_pt_transform_changed)
+	end.was_lmb_clicked.connect(_on_end_was_lmb_clicked)
 
 
 func clear_and_try_generate():
@@ -359,4 +364,11 @@ func sample(f_arr: Array[float], t: float) -> float:
 func _on_control_pt_transform_changed(sender: ControlPoint):
 	# prints(sender.name, "child's local transform has changed!")
 	clear_and_try_generate()
-	pass
+
+
+func _on_start_was_lmb_clicked(cp: ControlPoint, data: ControlPoint.InputEventData):
+	start_was_lmb_clicked.emit(self, cp, data)
+
+
+func _on_end_was_lmb_clicked(cp: ControlPoint, data: ControlPoint.InputEventData):
+	end_was_lmb_clicked.emit(self, cp, data)

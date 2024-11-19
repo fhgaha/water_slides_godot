@@ -167,7 +167,7 @@ func _ready():
 	raycast_target.mouse_entered.connect(show_edge)
 	raycast_target.mouse_exited.connect(hide_edge)
 
-	raycast_target.input_event.connect(_on_raycast_trg_input_event)
+	raycast_target.input_event.connect(_on_raycast_trg_lmb_clicked)
 
 
 func _notification(what: int) -> void:
@@ -175,20 +175,21 @@ func _notification(what: int) -> void:
 		regenerate_segment_request.emit(self)
 
 
-func _on_raycast_trg_input_event(
+func _on_raycast_trg_lmb_clicked(
 	camera: Node, 
 	event: InputEvent, 
 	event_position: Vector3, 
 	normal: Vector3, 
 	shape_idx: int
 ):
-	was_lmb_clicked.emit(
-		self, 
-		InputEventData.ctor(
-			camera, 
-			event, 
-			event_position, 
-			normal, 
-			shape_idx
+	if event is InputEventMouseButton && event.pressed && event.button_index == MOUSE_BUTTON_LEFT:
+		was_lmb_clicked.emit(
+			self, 
+			InputEventData.ctor(
+				camera, 
+				event, 
+				event_position, 
+				normal, 
+				shape_idx
+			)
 		)
-	)

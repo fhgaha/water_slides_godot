@@ -14,6 +14,25 @@ var cur_building_segm: TubeSegment
 var action_queue: Array[Callable] = []
 #endregion
 
+func add_segm(segm: TubeSegment):
+	segments.add_child(segm)
+	segm.start_was_lmb_clicked.connect(_on_segm_cp_was_lmb_clicked)
+	segm.end_was_lmb_clicked.connect(_on_segm_cp_was_lmb_clicked)
+
+
+func remove_segm(segm: TubeSegment):
+	segm.start_was_lmb_clicked.disconnect(_on_segm_cp_was_lmb_clicked)
+	segm.end_was_lmb_clicked.disconnect(_on_segm_cp_was_lmb_clicked)
+	segments.remove_child(segm)
+	segm.queue_free()
+
+
+func _ready():
+	for segm: TubeSegment in segments.get_children():
+		segm.start_was_lmb_clicked.connect(_on_segm_cp_was_lmb_clicked)
+		segm.end_was_lmb_clicked.connect(_on_segm_cp_was_lmb_clicked)
+	pass
+
 # 1. click on end, start dragging, generate on cursor move
 # 2. if lmb, spawn new segment. if rmb, reset. 
 
@@ -77,7 +96,7 @@ func react_to_mouse_button_when_building(event: InputEvent):
 
 func spawn_new_segm(spawn_global_pos: Vector3) -> TubeSegment:
 	var new_segm: TubeSegment = TUBE_SEGMENT_SCENE.instantiate()
-	segments.add_child(new_segm)
+	add_segm(new_segm)
 	# new_segm.name = "tube_segment_1"
 	new_segm.start.global_position = spawn_global_pos
 	var some_offset: Vector3 = Vector3.FORWARD * 10 + Vector3.DOWN * 10
@@ -87,35 +106,34 @@ func spawn_new_segm(spawn_global_pos: Vector3) -> TubeSegment:
 
 func _physics_process(_delta):
 	update_in_physics_process()
-
 	pass
 
 
 func update_in_physics_process():
 	match build_state:
 		BuildState.Idle:
-			if Input.is_action_just_pressed("lmb_clicked"):
-				var mouse_screen_position: Vector2 = get_viewport().get_mouse_position()
-				var result: Dictionary = cam.raycast(mouse_screen_position)
-				prints("result:", result)
-				if result && result.collider is ControlPointRaycastTarget:
-					# raycasted succsessfully
-					var cp_rc_trg = result.collider as ControlPointRaycastTarget
-					prints("found raycast target:", cp_rc_trg)
+			# if Input.is_action_just_pressed("lmb_clicked"):
+			# 	var mouse_screen_position: Vector2 = get_viewport().get_mouse_position()
+			# 	var result: Dictionary = cam.raycast(mouse_screen_position)
+			# 	prints("result:", result)
+			# 	if result && result.collider is ControlPointRaycastTarget:
+			# 		# raycasted succsessfully
+			# 		var cp_rc_trg = result.collider as ControlPointRaycastTarget
+			# 		prints("found raycast target:", cp_rc_trg)
 
-					# build mode on
-					cur_building_segm = spawn_new_segm(cp_rc_trg.cp_parent.global_position)
-					build_state = BuildState.Building
+			# 		# build mode on
+			# 		cur_building_segm = spawn_new_segm(cp_rc_trg.cp_parent.global_position)
+			# 		build_state = BuildState.Building
 					
-					var length := 20
-					var new_pos := cam.project_to_length(mouse_screen_position, length)
-					cur_building_segm.end.position = new_pos
-				pass
+			# 		var length := 20
+			# 		var new_pos := cam.project_to_length(mouse_screen_position, length)
+			# 		cur_building_segm.end.position = new_pos
+			# 	pass
 
 			pass
 		BuildState.Building:
 			assert(cur_building_segm, "current building tube segment is null: %s" % cur_building_segm)
-			var lmv = Input.get_last_mouse_velocity()
+			var lmv: Vector2 = Input.get_last_mouse_velocity()
 			if !lmv.is_zero_approx():
 				# handle mouse motion
 				var length := 20
@@ -124,11 +142,39 @@ func update_in_physics_process():
 				cur_building_segm.end.position = new_pos
 
 			if Input.is_action_just_pressed("lmb_clicked"):
-				# confirm build
-				cur_building_segm = null
-				build_state = BuildState.Idle
+				# # confirm build
+				# cur_building_segm = null
+				# build_state = BuildState.Idle
+				pass
 			elif Input.is_action_just_pressed("rmb_clicked"):
 				# cancel build
 				cur_building_segm.queue_free()
 				cur_building_segm = null
 				build_state = BuildState.Idle
+
+
+func _on_segm_cp_was_lmb_clicked(
+	segm: TubeSegment, 
+	cp: ControlPoint, 
+	data: ControlPoint.InputEventData
+):
+	match build_state:
+		BuildState.Idle:
+			# switch to building
+			# build mode on
+			cur_building_segm = spawn_new_segm(cp.global_position)
+			build_state = BuildState.Building
+			
+			var length := 20
+			# var new_pos := cam.project_to_length(mouse_screen_position, length)
+			var new_pos = cp.position
+			cur_building_segm.end.position = new_pos
+
+			pass
+		BuildState.Building:
+			cur_building_segm = null
+			build_state = BuildState.Idle
+
+			pass
+
+	pass
