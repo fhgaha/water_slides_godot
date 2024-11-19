@@ -1,7 +1,54 @@
 @tool
 class_name ControlPoint extends Node3D
 
+class InputEventData:
+	var camera: Node
+	var event: InputEvent 
+	var event_position: Vector3 
+	var normal: Vector3
+	var shape_idx: int
+
+	static func ctor(
+		camera: Node, 
+		event: InputEvent, 
+		event_position: Vector3, 
+		normal: Vector3, 
+		shape_idx: int
+	):
+		var data := InputEventData.new()
+		data.camera = camera
+		data.event = event
+		data.event_position = event_position
+		data.normal = normal
+		data.shape_idx = shape_idx
+		return data
+
+	func print():
+		prints(
+			"raycast trg recieved input event:",
+			"\n\tcamera:", camera,
+			"\n\tevent:", event,
+			"\n\tevent_position:", event_position,
+			"\n\tnormal:", normal, 
+			"\n\tshape_idx:", shape_idx
+		)
+	
+	func print_if_lmb_clicked():
+		if event is InputEventMouseButton && event.pressed && event.button_index == MOUSE_BUTTON_LEFT:
+			prints(
+				"raycast trg lmb click event:",
+				"\n\tcamera:", camera,
+				"\n\tevent:", event,
+				"\n\tevent_position:", event_position,
+				"\n\tnormal:", normal, 
+				"\n\tshape_idx:", shape_idx
+			)
+		else:
+			prints("raycast trg wasn't lmb clicked!")
+
+
 signal regenerate_segment_request(sender: ControlPoint)
+signal was_lmb_clicked(sender: ControlPoint, data: InputEventData)
 
 @export var display: bool:
 	set(value):
@@ -135,12 +182,13 @@ func _on_raycast_trg_input_event(
 	normal: Vector3, 
 	shape_idx: int
 ):
-	if event is InputEventMouseButton && event.pressed && event.button_index == MOUSE_BUTTON_LEFT:
-		prints(
-			"camera:", camera,
-			"event:", event,
-			"event_position:", event_position,
-			"normal:", normal, 
-			"shape_idx:", shape_idx
+	was_lmb_clicked.emit(
+		self, 
+		InputEventData.ctor(
+			camera, 
+			event, 
+			event_position, 
+			normal, 
+			shape_idx
 		)
-	pass
+	)
