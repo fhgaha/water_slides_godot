@@ -11,6 +11,12 @@ func raycast(mouse_screen_pos: Vector2) -> Dictionary:
 	return space_state.intersect_ray(params)
 
 
+func project_to_length(mouse_screen_pos: Vector2, length: float) -> Vector3:
+	var from: Vector3 = cam.project_ray_origin(mouse_screen_pos)
+	var to  : Vector3 = cam.project_ray_normal(mouse_screen_pos) * length
+	return from + to
+
+
 func project_to_screen(mouse_screen_pos: Vector2) -> Vector3:
 	var from: Vector3 = cam.project_ray_origin(mouse_screen_pos)
 	var to  : Vector3 = cam.project_ray_normal(mouse_screen_pos)

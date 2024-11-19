@@ -8,8 +8,11 @@ const TUBE_SEGMENT_SCENE = preload("res://scenes/tube_segment_0.tscn")
 
 @onready var segments: Node3D = $segments
 
+#region building state
 var build_state: BuildState = BuildState.Idle
 var cur_building_segm: TubeSegment
+var action_queue: Array[Callable] = []
+#endregion
 
 # 1. click on end, start dragging, generate on cursor move
 # 2. if lmb, spawn new segment. if rmb, reset. 
@@ -17,50 +20,55 @@ var cur_building_segm: TubeSegment
 func _input(event: InputEvent) -> void:
 	match build_state:
 		BuildState.Idle:
-			react_to_lmb_when_idle(event)
-			pass
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				action_queue.append(react_to_lmb_when_idle)
+			
 		BuildState.Building:
 			assert(cur_building_segm, "current building tube segment is null: %s" % cur_building_segm)
 			if event is InputEventMouseMotion:
-				var mouse_screen_position: Vector2 = event.position
-				var z_offset: Vector3 = cur_building_segm.start.position + Vector3.FORWARD * 10
-				# var mouse_world_position: Vector3 \
-					# = Utils.vec2_extrude(mouse_screen_position) + z_offset
-				# cur_building_segm.end.global_position = mouse_world_position
-				# var new_pos_no_offset = cam.project_to_screen(
-				# 	mouse_screen_position, 
-				# 	cur_building_segm.start.global_position
-				# )
-				var new_pos_no_offset = cam.project_to_screen(mouse_screen_position)
-				var new_pos = new_pos_no_offset #- z_offset
-				cur_building_segm.end.position = new_pos
+				action_queue.append(react_to_mouse_motion_when_building)
 
-				prints("mouse pos: %s, world pos: %s" % [mouse_screen_position, new_pos])
-
-			# prints("start: %s, end %s" % [
-			# 	cur_building_segm.start.global_position, 
-			# 	cur_building_segm.end.global_position
-			# ])
-			pass
-
+			react_to_mouse_button_when_building(event)
 
 
 func react_to_lmb_when_idle(event: InputEvent):
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var mouse_screen_position: Vector2 = event.position
-		var result: Dictionary = cam.raycast(mouse_screen_position)
-		if result && result.collider is ControlPointRaycastTarget:
-			var cp_rc_trg = result.collider as ControlPointRaycastTarget
-			prints("found raycast target:", cp_rc_trg)
+	var mouse_screen_position: Vector2 = event.position
+	var result: Dictionary = cam.raycast(mouse_screen_position)
+	prints("result:", result)
+	if result && result.collider is ControlPointRaycastTarget:
+		var cp_rc_trg = result.collider as ControlPointRaycastTarget
+		prints("found raycast target:", cp_rc_trg)
 
-			# action
-			cur_building_segm = spawn_new_segm(cp_rc_trg.cp_parent.global_position)
-			build_state = BuildState.Building
+		# action
+		cur_building_segm = spawn_new_segm(cp_rc_trg.cp_parent.global_position)
+		build_state = BuildState.Building
 
-			# var mesh_inst = MeshInstance3D.new()
-			# mesh_inst.mesh = BoxMesh.new()
-			# add_child(mesh_inst)
-			# mesh_inst.global_position = cp_rc_trg.cp_parent.global_position
+		# var mesh_inst = MeshInstance3D.new()
+		# mesh_inst.mesh = BoxMesh.new()
+		# add_child(mesh_inst)
+		# mesh_inst.global_position = cp_rc_trg.cp_parent.global_position
+
+
+func react_to_mouse_motion_when_building(event: InputEvent):
+	var mouse_screen_position: Vector2 = event.position
+	
+	# this should be run in _physics_process()
+	var length := 20
+	var new_pos := cam.project_to_length(mouse_screen_position, length)
+	cur_building_segm.end.position = new_pos
+
+
+func react_to_mouse_button_when_building(event: InputEvent):
+	if event is InputEventMouseButton and event.pressed: 
+		match event.button_index: 
+			MOUSE_BUTTON_LEFT:
+				cur_building_segm = null
+				build_state = BuildState.Idle
+			MOUSE_BUTTON_RIGHT:
+				cur_building_segm.queue_free()
+				cur_building_segm = null
+				build_state = BuildState.Idle
+		pass
 
 
 func spawn_new_segm(spawn_global_pos: Vector3) -> TubeSegment:
@@ -80,6 +88,9 @@ func _physics_process(delta):
 		BuildState.Building:
 			pass
 
+	while(!action_queue.is_empty()):
+		action_queue.pop_front().call()
+	
 	# prints("build state:", BuildState.keys()[build_state])
 
 	pass
