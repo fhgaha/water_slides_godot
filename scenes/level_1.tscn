@@ -43,4 +43,3 @@ cam = NodePath("../cam_controller")
 [node name="segments" type="Node3D" parent="tube_0"]
 
 [node name="tube_segment_0" parent="tube_0/segments" instance=ExtResource("3_gufkc")]
-ring_amnt = 12

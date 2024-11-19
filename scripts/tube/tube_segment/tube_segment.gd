@@ -50,7 +50,7 @@ func clear_and_try_generate():
 	assert(start, "%s: No start point assigned" % name)
 	assert(end, "%s: No end point assigned" % name)
 	
-	prints(self.name, ": generating!")
+	# prints(self.name, ": generating!")
 	generate_bezier_ops()
 	
 	if draw_line_gizmo:

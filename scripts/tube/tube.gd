@@ -18,15 +18,17 @@ var action_queue: Array[Callable] = []
 # 2. if lmb, spawn new segment. if rmb, reset. 
 
 func _input(event: InputEvent) -> void:
+	return
+	
 	match build_state:
 		BuildState.Idle:
 			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-				action_queue.append(react_to_lmb_when_idle)
+				action_queue.append(react_to_lmb_when_idle.bind(event))
 			
 		BuildState.Building:
 			assert(cur_building_segm, "current building tube segment is null: %s" % cur_building_segm)
 			if event is InputEventMouseMotion:
-				action_queue.append(react_to_mouse_motion_when_building)
+				action_queue.append(react_to_mouse_motion_when_building.bind(event))
 
 			react_to_mouse_button_when_building(event)
 
@@ -42,6 +44,7 @@ func react_to_lmb_when_idle(event: InputEvent):
 		# action
 		cur_building_segm = spawn_new_segm(cp_rc_trg.cp_parent.global_position)
 		build_state = BuildState.Building
+		action_queue.append(react_to_mouse_motion_when_building.bind(event))
 
 		# var mesh_inst = MeshInstance3D.new()
 		# mesh_inst.mesh = BoxMesh.new()
@@ -81,16 +84,50 @@ func spawn_new_segm(spawn_global_pos: Vector3) -> TubeSegment:
 	return new_segm
 
 
-func _physics_process(delta):
-	match build_state:
-		BuildState.Idle:
-			pass
-		BuildState.Building:
-			pass
-
-	while(!action_queue.is_empty()):
-		action_queue.pop_front().call()
-	
-	# prints("build state:", BuildState.keys()[build_state])
+func _physics_process(_delta):
+	# update_in_physics_process()
 
 	pass
+
+
+# shit still doesnt work
+func update_in_physics_process():
+	match build_state:
+		BuildState.Idle:
+			if Input.is_action_just_pressed("lmb_clicked"):
+				var mouse_screen_position: Vector2 = get_viewport().get_mouse_position()
+				var result: Dictionary = cam.raycast(mouse_screen_position)
+				prints("result:", result)
+				if result && result.collider is ControlPointRaycastTarget:
+					var cp_rc_trg = result.collider as ControlPointRaycastTarget
+					prints("found raycast target:", cp_rc_trg)
+
+					# build mode on
+					cur_building_segm = spawn_new_segm(cp_rc_trg.cp_parent.global_position)
+					build_state = BuildState.Building
+					
+					var length := 20
+					var new_pos := cam.project_to_length(mouse_screen_position, length)
+					cur_building_segm.end.position = new_pos
+				pass
+
+			pass
+		BuildState.Building:
+			assert(cur_building_segm, "current building tube segment is null: %s" % cur_building_segm)
+			var lmv = Input.get_last_mouse_velocity()
+			if !lmv.is_zero_approx():
+				# handle mouse motion
+				var length := 20
+				var mouse_screen_position: Vector2 = get_viewport().get_mouse_position()
+				var new_pos := cam.project_to_length(mouse_screen_position, length)
+				cur_building_segm.end.position = new_pos
+
+			if Input.is_action_just_pressed("lmb_clicked"):
+				# confirm build
+				cur_building_segm = null
+				build_state = BuildState.Idle
+			elif Input.is_action_just_pressed("rmb_clicked"):
+				# cancel build
+				cur_building_segm.queue_free()
+				cur_building_segm = null
+				build_state = BuildState.Idle

@@ -15,6 +15,23 @@ run/main_scene="res://scenes/level_1.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[debug]
+
+shapes/collision/shape_color=Color(0.977671, 0, 0.342574, 1)
+
+[input]
+
+lmb_clicked={
+"deadzone": 0.5,
+"events": [null, Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":1,"position":Vector2(167, 18),"global_position":Vector2(176, 64),"factor":1.0,"button_index":1,"canceled":false,"pressed":true,"double_click":false,"script":null)
+]
+}
+rmb_clicked={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":2,"position":Vector2(146, 6),"global_position":Vector2(155, 52),"factor":1.0,"button_index":2,"canceled":false,"pressed":true,"double_click":false,"script":null)
+]
+}
+
 [physics]
 
 3d/physics_engine="JoltPhysics3D"
