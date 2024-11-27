@@ -112,24 +112,6 @@ func _physics_process(_delta):
 func update_in_physics_process():
 	match build_state:
 		BuildState.Idle:
-			# if Input.is_action_just_pressed("lmb_clicked"):
-			# 	var mouse_screen_position: Vector2 = get_viewport().get_mouse_position()
-			# 	var result: Dictionary = cam.raycast(mouse_screen_position)
-			# 	prints("result:", result)
-			# 	if result && result.collider is ControlPointRaycastTarget:
-			# 		# raycasted succsessfully
-			# 		var cp_rc_trg = result.collider as ControlPointRaycastTarget
-			# 		prints("found raycast target:", cp_rc_trg)
-
-			# 		# build mode on
-			# 		cur_building_segm = spawn_new_segm(cp_rc_trg.cp_parent.global_position)
-			# 		build_state = BuildState.Building
-					
-			# 		var length := 20
-			# 		var new_pos := cam.project_to_length(mouse_screen_position, length)
-			# 		cur_building_segm.end.position = new_pos
-			# 	pass
-
 			pass
 		BuildState.Building:
 			assert(cur_building_segm, "current building tube segment is null: %s" % cur_building_segm)
@@ -142,10 +124,8 @@ func update_in_physics_process():
 				cur_building_segm.end.position = new_pos
 
 			if Input.is_action_just_pressed("lmb_clicked"):
-				# # confirm build
-				# cur_building_segm = null
-				# build_state = BuildState.Idle
 				pass
+			# use the signal
 			elif Input.is_action_just_pressed("rmb_clicked"):
 				# cancel build
 				cur_building_segm.queue_free()
@@ -154,27 +134,19 @@ func update_in_physics_process():
 
 
 func _on_segm_cp_was_lmb_clicked(
-	segm: TubeSegment, 
+	_segm: TubeSegment, 
 	cp: ControlPoint, 
-	data: ControlPoint.InputEventData
+	_data: ControlPoint.InputEventData
 ):
 	match build_state:
 		BuildState.Idle:
-			# switch to building
-			# build mode on
+			# switch to building mode
 			cur_building_segm = spawn_new_segm(cp.global_position)
 			build_state = BuildState.Building
-			
-			var length := 20
-			# var new_pos := cam.project_to_length(mouse_screen_position, length)
-			var new_pos = cp.position
-			cur_building_segm.end.position = new_pos
-
+			cur_building_segm.end.position = cp.position
 			pass
 		BuildState.Building:
 			cur_building_segm = null
 			build_state = BuildState.Idle
-
 			pass
-
 	pass

@@ -19,6 +19,10 @@ config/icon="res://icon.svg"
 
 shapes/collision/shape_color=Color(0.977671, 0, 0.342574, 1)
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/orbit_camera/plugin.cfg")
+
 [input]
 
 lmb_clicked={
