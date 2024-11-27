@@ -117,7 +117,7 @@ func update_in_physics_process():
 			assert(cur_building_segm, "current building tube segment is null: %s" % cur_building_segm)
 			var lmv: Vector2 = Input.get_last_mouse_velocity()
 			if !lmv.is_zero_approx():
-				# handle mouse motion
+				# set end pos to mouse pos
 				var length := 20
 				var mouse_screen_position: Vector2 = get_viewport().get_mouse_position()
 				var new_pos := cam.project_to_length(mouse_screen_position, length)
