@@ -8,14 +8,14 @@ func with_4_control_points(arr: Array[Vector3]) -> CubicBezier3d:
 		self.pts[i] = arr[i]
 	return self
 
-func with_2_control_points(start: Node3D, end: Node3D) -> CubicBezier3d:
+func with_2_control_points(start: ControlPoint, end: ControlPoint) -> CubicBezier3d:
 	calc_for_2_control_points(start, end)
 	return self
 
-func calc_for_2_control_points(start: Node3D, end: Node3D):
+func calc_for_2_control_points(start: ControlPoint, end: ControlPoint):
 	pts[0] = start.position
-	pts[1] = start.to_global(Vector3.FORWARD * start.scale.z)
-	pts[2] = end.to_global(Vector3.BACK * end.scale.z)
+	pts[1] = start.to_global(Vector3.FORWARD * start.nearest_cp_z_offest)
+	pts[2] = end.to_global(Vector3.BACK * end.nearest_cp_z_offest)
 	pts[3] = end.position
 
 func get_point(t: float) -> Vector3:

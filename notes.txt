@@ -1,5 +1,13 @@
+Jitspoe's brick shader: https://github.com/godotengine/godot-proposals/issues/8671
+
 Maybe
++ amnt should depend on tube length
 - control points scaling should depend on tube length
-- amnt should depend on tube length
 - generate tube edge transparent thing for interaction
- 
+
+
+Noted
+- should not change segment positions, only start and end positions i guess
+
+Issues
+- spawned tubes are generated 4 times. no good. @export gets called on node creation i guess

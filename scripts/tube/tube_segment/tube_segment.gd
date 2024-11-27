@@ -1,43 +1,27 @@
 @tool
 class_name TubeSegment extends Node3D
 
-@export var draw: bool = false:
+signal start_was_lmb_clicked(sender: TubeSegment, start: ControlPoint, data: ControlPoint.InputEventData)
+signal end_was_lmb_clicked(sender: TubeSegment, end: ControlPoint, data: ControlPoint.InputEventData)
+
+@export var draw: bool = true:
 	set(value):
 		draw = value
 		clear_and_try_generate()
 
 @export var draw_line_gizmo: bool = false
 
-@export var amnt: int = 10:
+@export_range(0.1, 100.) var dist_between_rings: float = 1.:
 	set(value):
-		amnt = value
-		clear_and_try_generate()
-
-@export var start: ControlPoint:
-	set(value):
-		if value:
-			start = value
-			assert(start != end, "start is set but its equal to end!")
-			start.local_transform_changed.connect(_on_control_pt_transform_changed)
-		else:
-			start.disconnect(StringName("local_transform_changed"), _on_control_pt_transform_changed)
-			start = value
-		clear_and_try_generate()
-
-@export var end: ControlPoint:
-	set(value):
-		if value:
-			end = value
-			assert(start != end, "end is set but its equal to start!")
-			end.local_transform_changed.connect(_on_control_pt_transform_changed)
-		else:
-			end.disconnect(StringName("local_transform_changed"), _on_control_pt_transform_changed)
-			end = value
+		dist_between_rings = value
 		clear_and_try_generate()
 
 @export var body_material: StandardMaterial3D
-@export var start_edge_material: StandardMaterial3D
-@export var end_edge_material: StandardMaterial3D
+
+@export_category("do not change in editor")
+@export var ring_amnt: int
+@export var start: ControlPoint
+@export var end: ControlPoint
 
 @onready var mesh_instance_3d: MeshInstance3D = $MeshInstance3D
 
@@ -49,6 +33,14 @@ func _ready() -> void:
 	bezier = CubicBezier3d.new()
 	# hack to make duplicates not reference each others children
 	mesh_instance_3d.mesh = mesh_instance_3d.mesh.duplicate()
+
+	start = $control_pts/start
+	start.regenerate_segment_request.connect(_on_control_pt_transform_changed)
+	start.was_lmb_clicked.connect(_on_start_was_lmb_clicked)
+
+	end = $control_pts/end
+	end.regenerate_segment_request.connect(_on_control_pt_transform_changed)
+	end.was_lmb_clicked.connect(_on_end_was_lmb_clicked)
 
 
 func clear_and_try_generate():
@@ -63,6 +55,7 @@ func clear_and_try_generate():
 	assert(start, "%s: No start point assigned" % name)
 	assert(end, "%s: No end point assigned" % name)
 	
+	# prints(self.name, ": generating!")
 	generate_bezier_ops()
 	
 	if draw_line_gizmo:
@@ -71,16 +64,29 @@ func clear_and_try_generate():
 				func(op: OrientedPoint): return op.pos
 		))
 	
-	extrude(mesh, ExtrudeShape.circle_8(), bezier_ops)
+	var shape = ExtrudeShape.circle_8()
+	extrude(mesh, shape, bezier_ops)
+	start.edge(shape, bezier_ops)
+	end.edge(shape, bezier_ops)
+
+	#sphere(mesh)
+	#square(mesh)
+	#square_with_center(mesh)
+
 
 func generate_bezier_ops():
+	ring_amnt = (start.position - end.position).length() / dist_between_rings as int
+	if ring_amnt < 2: ring_amnt = 2
+
 	bezier.calc_for_2_control_points(start, end)
 	bezier_ops.clear()
-	for i in amnt:
-		var t = i as float/(amnt - 1) as float
+	
+	for i in ring_amnt:
+		var t = i as float/(ring_amnt - 1) as float
 		var up: Vector3 = lerp(start.basis.y, end.basis.y, t)
 		var op: OrientedPoint = bezier.get_oriented_pt(t, up)
 		bezier_ops.append(op)
+
 
 func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	var verts_in_shape: int = shape.vertex_count()	#16
@@ -142,89 +148,6 @@ func extrude(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint]):
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_0_array)
 	if mesh.surface_get_material(0) != body_material:
 		mesh.surface_set_material(0, body_material)
-	
-	## last edge
-	edge(mesh, shape, path, true)
-	edge(mesh, shape, path, false)
-
-	#sphere(mesh)
-	#square(mesh)
-	#square_with_center(mesh)
-
-func edge(mesh: ArrayMesh, shape: ExtrudeShape, path: Array[OrientedPoint], is_first: bool):
-	var verts_in_shape: int = shape.vertex_count()	#16
-	var edge_loops: int = path.size()
-	var edge_verts_amnt: int = (verts_in_shape - 1) / 2 * 3	# 21
-
-	var triangle_indices = PackedInt32Array()  
-	var vertices         = PackedVector3Array()
-	var normals          = PackedVector3Array()
-	var uvs              = PackedVector2Array()
-	triangle_indices.resize(edge_verts_amnt + 3)
-	vertices        .resize(edge_verts_amnt)
-	normals         .resize(edge_verts_amnt)
-	uvs             .resize(edge_verts_amnt)
-	
-	var base_op: OrientedPoint = path[0] if is_first else path[edge_loops - 1]
-	var ti: int = 0
-	var normal = base_op.rot.get_euler()
-	for i in range(0, verts_in_shape - 2, 2): 
-		vertices.set(ti, base_op.pos)
-		normals .set(ti, normal)
-		uvs     .set(ti, Vector2.DOWN)
-		ti += 1
-		var point: Vector3 = base_op.local_to_world(Utils.vec2_extrude(shape.vertices[i + 1].point))
-		# var normal: Vector3 = last_op.local_to_world_direction(Utils.vec2_extrude(shape.vertices[i + 1].normal))
-		vertices.set(ti, point)
-		normals .set(ti, normal)
-		uvs     .set(ti, Vector2(shape.vertices[i + 1].u, 1.))
-		ti += 1
-		point = base_op.local_to_world(Utils.vec2_extrude(shape.vertices[i + 2].point))
-		# normal = last_op.local_to_world_direction(Utils.vec2_extrude(shape.vertices[i + 2].normal))
-		vertices.set(ti, point)
-		normals .set(ti, normal)
-		uvs     .set(ti, Vector2(shape.vertices[i + 2].u, 1.))
-		ti += 1
-
-	ti = 0
-	if is_first:
-		for l in range(0, edge_verts_amnt, 3):
-			triangle_indices.set(ti, l  ); ti += 1;
-			triangle_indices.set(ti, l+2); ti += 1;
-			triangle_indices.set(ti, l+1); ti += 1;
-
-		# last triangle
-		triangle_indices.set(ti, 0                     ); ti += 1;
-		triangle_indices.set(ti, 1                     ); ti += 1;
-		triangle_indices.set(ti, edge_verts_amnt - 1); ti += 1;
-	else:
-		for l in range(0, edge_verts_amnt, 3):
-			triangle_indices.set(ti, l  ); ti += 1;
-			triangle_indices.set(ti, l+1); ti += 1;
-			triangle_indices.set(ti, l+2); ti += 1;
-
-		# last triangle
-		triangle_indices.set(ti, 0                     ); ti += 1;
-		triangle_indices.set(ti, edge_verts_amnt - 1); ti += 1;
-		triangle_indices.set(ti, 1                     ); ti += 1;
-	
-
-	# prints("vertex:", le_vertices.size(), "uvs:", le_uvs.size(), \
-	# "normals:", le_normals.size(), "indices:", le_triangle_indices.size())
-	# vertex: 21 uvs: 21 normals: 21 indices: 24
-	
-	var surface_array = []
-	surface_array.resize(Mesh.ARRAY_MAX)
-	surface_array[Mesh.ARRAY_VERTEX] = vertices
-	surface_array[Mesh.ARRAY_TEX_UV] = uvs
-	surface_array[Mesh.ARRAY_NORMAL] = normals
-	surface_array[Mesh.ARRAY_INDEX]  = triangle_indices
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
-
-	var surf_id = 1 if is_first else 2
-	var mat = start_edge_material if is_first else end_edge_material
-	if mesh.surface_get_material(surf_id) != mat:
-		mesh.surface_set_material(surf_id, mat)
 
 
 func square_with_center(mesh: ArrayMesh):
@@ -441,4 +364,11 @@ func sample(f_arr: Array[float], t: float) -> float:
 func _on_control_pt_transform_changed(sender: ControlPoint):
 	# prints(sender.name, "child's local transform has changed!")
 	clear_and_try_generate()
-	pass
+
+
+func _on_start_was_lmb_clicked(cp: ControlPoint, data: ControlPoint.InputEventData):
+	start_was_lmb_clicked.emit(self, cp, data)
+
+
+func _on_end_was_lmb_clicked(cp: ControlPoint, data: ControlPoint.InputEventData):
+	end_was_lmb_clicked.emit(self, cp, data)

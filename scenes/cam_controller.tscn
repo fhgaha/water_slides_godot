@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://3av383e3f6n7"]
+
+[ext_resource type="Script" path="res://scripts/camera/camera_controller.gd" id="1_pyxbj"]
+[ext_resource type="Script" path="res://scripts/camera/cam_gimbal_y.gd" id="2_epy7i"]
+
+[node name="cam_controller" type="Node3D" node_paths=PackedStringArray("cam")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.999999, -0.79295, 13.7319, -35.298)
+script = ExtResource("1_pyxbj")
+cam = NodePath("gimbal_y/gimbal_x/Camera3D")
+
+[node name="gimbal_y" type="Node3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+script = ExtResource("2_epy7i")
+
+[node name="gimbal_x" type="Node3D" parent="gimbal_y"]
+
+[node name="Camera3D" type="Camera3D" parent="gimbal_y/gimbal_x"]
