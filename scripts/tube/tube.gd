@@ -11,8 +11,8 @@ const TUBE_SEGMENT_SCENE = preload("res://scenes/tube_segment_0.tscn")
 #region building state
 var build_state: BuildState = BuildState.Idle
 var cur_building_segm: TubeSegment
-var action_queue: Array[Callable] = []
 #endregion
+
 
 func add_segm(segm: TubeSegment):
 	segments.add_child(segm)
@@ -33,65 +33,9 @@ func _ready():
 		segm.end_was_lmb_clicked.connect(_on_segm_cp_was_lmb_clicked)
 	pass
 
+
 # 1. click on end, start dragging, generate on cursor move
 # 2. if lmb, spawn new segment. if rmb, reset. 
-
-func _input(event: InputEvent) -> void:
-	return
-	
-	match build_state:
-		BuildState.Idle:
-			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-				action_queue.append(react_to_lmb_when_idle.bind(event))
-			
-		BuildState.Building:
-			assert(cur_building_segm, "current building tube segment is null: %s" % cur_building_segm)
-			if event is InputEventMouseMotion:
-				action_queue.append(react_to_mouse_motion_when_building.bind(event))
-
-			react_to_mouse_button_when_building(event)
-
-
-func react_to_lmb_when_idle(event: InputEvent):
-	var mouse_screen_position: Vector2 = event.position
-	var result: Dictionary = cam.raycast(mouse_screen_position)
-	prints("result:", result)
-	if result && result.collider is ControlPointRaycastTarget:
-		var cp_rc_trg = result.collider as ControlPointRaycastTarget
-		prints("found raycast target:", cp_rc_trg)
-
-		# action
-		cur_building_segm = spawn_new_segm(cp_rc_trg.cp_parent.global_position)
-		build_state = BuildState.Building
-		action_queue.append(react_to_mouse_motion_when_building.bind(event))
-
-		# cube spawn
-		# var mesh_inst = MeshInstance3D.new()
-		# mesh_inst.mesh = BoxMesh.new()
-		# add_child(mesh_inst)
-		# mesh_inst.global_position = cp_rc_trg.cp_parent.global_position
-
-
-func react_to_mouse_motion_when_building(event: InputEvent):
-	var mouse_screen_position: Vector2 = event.position
-	
-	# this should be run in _physics_process()
-	var length := 20
-	var new_pos := cam.project_to_length(mouse_screen_position, length)
-	cur_building_segm.end.position = new_pos
-
-
-func react_to_mouse_button_when_building(event: InputEvent):
-	if event is InputEventMouseButton and event.pressed: 
-		match event.button_index: 
-			MOUSE_BUTTON_LEFT:
-				cur_building_segm = null
-				build_state = BuildState.Idle
-			MOUSE_BUTTON_RIGHT:
-				cur_building_segm.queue_free()
-				cur_building_segm = null
-				build_state = BuildState.Idle
-		pass
 
 
 func spawn_new_segm(spawn_global_pos: Vector3) -> TubeSegment:
@@ -141,11 +85,13 @@ func _on_segm_cp_was_lmb_clicked(
 	match build_state:
 		BuildState.Idle:
 			# switch to building mode
-			cur_building_segm = spawn_new_segm(cp.global_position)
 			build_state = BuildState.Building
+			cur_building_segm = spawn_new_segm(cp.global_position)
 			cur_building_segm.end.position = cp.position
+			cam.change_parent(cp)
 			pass
 		BuildState.Building:
+			# switch to idle mode
 			cur_building_segm = null
 			build_state = BuildState.Idle
 			pass

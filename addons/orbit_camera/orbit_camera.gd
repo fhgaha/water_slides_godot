@@ -10,7 +10,6 @@ extends Camera3D
 @export var TOUCH_INVERT_ZOOM: bool = false
 
 @export var ROTATION_BUTTON: MouseButton = MOUSE_BUTTON_RIGHT
-@export var PAN_BUTTON: MouseButton = MOUSE_BUTTON_MIDDLE	# not used
 
 # Event var
 var _move_speed: Vector2
