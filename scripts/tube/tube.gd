@@ -107,7 +107,7 @@ func spawn_new_segm(spawn_global_pos: Vector3) -> TubeSegment:
 func _physics_process(_delta):
 	update_in_physics_process()
 	pass
-
+  
 
 func update_in_physics_process():
 	match build_state:
