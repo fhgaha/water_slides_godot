@@ -64,7 +64,7 @@ script = ExtResource("4_ua06q")
 cam = NodePath("wasd_mover/spinner_y/spinner_x/mover_z/Camera3D")
 target = NodePath("../tube_0/segments/tube_segment_0/control_pts/end")
 spin_y_deg = 189.0
-spin_x_deg = -26.0
+spin_x_deg = -20.0
 zoom_z = 40.0
 
 [node name="wasd_mover" type="Node3D" parent="cam_controller"]
@@ -74,7 +74,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.39802, 0, -3.02155)
 transform = Transform3D(-0.986856, 0, -0.161604, 0, 1, 0, 0.161604, 0, -0.986856, 0, 0, 0)
 
 [node name="spinner_x" type="Node3D" parent="cam_controller/wasd_mover/spinner_y"]
-transform = Transform3D(1, 0, 0, 0, 0.898794, 0.438371, 0, -0.438371, 0.898794, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 0.941471, 0.337095, 0, -0.337095, 0.941471, 0, 0, 0)
 
 [node name="mover_z" type="Node3D" parent="cam_controller/wasd_mover/spinner_y/spinner_x"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 40)

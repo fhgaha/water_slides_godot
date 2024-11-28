@@ -67,10 +67,10 @@ func change_parent(cp: ControlPoint):
 	pass
 
 func _ready():
-	spinner_y.global_rotation = Quaternion.IDENTITY.get_euler()
-	spinner_x.global_rotation = Quaternion.IDENTITY.get_euler()
-	spinner_y.global_rotate(Vector3.UP, deg_to_rad(spin_y_deg))
-	spinner_x.global_rotate(Vector3.LEFT, deg_to_rad(spin_x_deg))
+	spinner_y.rotation = Vector3.ZERO
+	spinner_x.rotation = Vector3.ZERO
+	spinner_y.rotation.y = deg_to_rad(spin_y_deg)
+	spinner_x.rotation.x = deg_to_rad(spin_x_deg)
 	mover_z.position.z = zoom_z
 
 	pass
