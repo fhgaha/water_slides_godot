@@ -21,17 +21,22 @@ class_name CameraController extends Node
 @export var can_move: bool = false
 
 @export var SPEED: int = 100
-@export var PAN_BUTTON: MouseButton = MOUSE_BUTTON_MIDDLE	# not used
+@export var ROTATE_BUTTON: MouseButton = MOUSE_BUTTON_RIGHT
+@export var ROT_Y_SPEED: float = 0.01
+@export var ROT_X_SPEED: float = 0.01
+
+@export var PAN_BUTTON: MouseButton = MOUSE_BUTTON_MIDDLE
 
 @export_group("Limits")
 @export_range(0, 360) 	var spin_y_deg: float	#glob rotation.y
-@export_range(-89, -5) 	var spin_x_deg: float	#glob rotation.x
-@export_range(20, 100) 	var zoom_z: float		#position.z
+const MIN_X_DEG: float = -89
+const MAX_X_DEG: float = -5
+@export_range(MIN_X_DEG, MAX_X_DEG) var spin_x_deg: float	#glob rotation.x
+@export_range(20, 100) 				var zoom_z: float		#position.z
 
-@onready var wasd_mover: 	Node3D = $wasd_mover
-@onready var spinner_y: 	Node3D = $wasd_mover/spinner_y
-@onready var spinner_x: 	Node3D = $wasd_mover/spinner_y/spinner_x
-@onready var mover_z: 		Node3D = $wasd_mover/spinner_y/spinner_x/mover_z
+@onready var spinner_y: 	Node3D = $spinner_y	# also this node is moved around on wasd
+@onready var spinner_x: 	Node3D = $spinner_y/spinner_x
+@onready var mover_z: 		Node3D = $spinner_y/spinner_x/mover_z
 
 ### this should be run in _physics_process()
 func raycast(mouse_screen_pos: Vector2) -> Dictionary:
@@ -58,13 +63,14 @@ func project_to_screen(mouse_screen_pos: Vector2) -> Vector3:
 
 
 func reset_pos():
-	wasd_mover.position = Vector3.ZERO
+	pass
 
 
 func change_parent(cp: ControlPoint):
 	reset_pos()
 	reparent(cp, false)
 	pass
+
 
 func _ready():
 	spinner_y.rotation = Vector3.ZERO
@@ -75,16 +81,32 @@ func _ready():
 
 	pass
 
+
 func _physics_process(delta: float):
 	if can_move:
 		move(delta)
+	rotate(delta)
+
 
 func move(dt: float):
-	var velocity: Vector2 = Input.get_vector(
+	var dir: Vector2 = Input.get_vector(
 		"move_cam_left", 
 		"move_cam_right", 
 		"move_cam_forward", 
 		"move_cam_back"
 	)
-	wasd_mover.position += Vector3(velocity.x, 0, velocity.y) * dt * SPEED
+	spinner_y.translate_object_local(Vector3(dir.x, 0, dir.y) * dt * SPEED)
 
+
+func rotate(dt: float):
+	if Input.is_mouse_button_pressed(ROTATE_BUTTON):
+		var vel := Input.get_last_mouse_velocity()
+		spinner_y.rotation.y -= vel.x * dt * ROT_Y_SPEED
+
+		spinner_x.rotation.x -= vel.y * dt * 0.005
+		spinner_x.rotation.x = clampf(
+			spinner_x.rotation.x, 
+			deg_to_rad(MIN_X_DEG),
+			deg_to_rad(MAX_X_DEG), 
+		) 
+	pass

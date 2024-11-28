@@ -61,25 +61,23 @@ metadata/_edit_lock_ = true
 
 [node name="cam_controller" type="Node" parent="." node_paths=PackedStringArray("cam", "target")]
 script = ExtResource("4_ua06q")
-cam = NodePath("wasd_mover/spinner_y/spinner_x/mover_z/Camera3D")
+cam = NodePath("spinner_y/spinner_x/mover_z/Camera3D")
 target = NodePath("../tube_0/segments/tube_segment_0/control_pts/end")
+can_move = true
 spin_y_deg = 189.0
 spin_x_deg = -20.0
 zoom_z = 40.0
 
-[node name="wasd_mover" type="Node3D" parent="cam_controller"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.39802, 0, -3.02155)
+[node name="spinner_y" type="Node3D" parent="cam_controller"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 
-[node name="spinner_y" type="Node3D" parent="cam_controller/wasd_mover"]
-transform = Transform3D(-0.986856, 0, -0.161604, 0, 1, 0, 0.161604, 0, -0.986856, 0, 0, 0)
-
-[node name="spinner_x" type="Node3D" parent="cam_controller/wasd_mover/spinner_y"]
+[node name="spinner_x" type="Node3D" parent="cam_controller/spinner_y"]
 transform = Transform3D(1, 0, 0, 0, 0.941471, 0.337095, 0, -0.337095, 0.941471, 0, 0, 0)
 
-[node name="mover_z" type="Node3D" parent="cam_controller/wasd_mover/spinner_y/spinner_x"]
+[node name="mover_z" type="Node3D" parent="cam_controller/spinner_y/spinner_x"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 40)
 
-[node name="Camera3D" type="Camera3D" parent="cam_controller/wasd_mover/spinner_y/spinner_x/mover_z"]
+[node name="Camera3D" type="Camera3D" parent="cam_controller/spinner_y/spinner_x/mover_z"]
 transform = Transform3D(1, 0, 0, -1.49012e-08, 1, -2.98023e-08, -2.98023e-08, 0, 1, 0, 0, 0)
 metadata/_edit_lock_ = true
 
