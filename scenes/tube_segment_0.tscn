@@ -10,7 +10,7 @@ cull_mode = 2
 albedo_texture = ExtResource("2_0dnd6")
 uv1_scale = Vector3(1, 0.1, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_45r83"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_5vr0g"]
 resource_local_to_scene = true
 _surfaces = [{
 "aabb": AABB(-1, 0, -10, 2, 21, 10),
@@ -76,7 +76,7 @@ start = NodePath("control_pts/start")
 end = NodePath("control_pts/end")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("ArrayMesh_45r83")
+mesh = SubResource("ArrayMesh_5vr0g")
 metadata/_edit_lock_ = true
 
 [node name="control_pts" type="Node3D" parent="."]

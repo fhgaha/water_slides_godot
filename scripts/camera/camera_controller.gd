@@ -1,13 +1,41 @@
-class_name CameraController extends Node3D
+# https://www.reddit.com/r/godot/comments/yoo3ye/rotating_camera_around_object/
+
+# Create a Spatial node. (I will be calling it "Main" from now on)
+# Add whatever you want to be at the center (I will be calling it "Target") as a child of Main
+# Add another Spatial as a child of Main (I will be calling it "Spinner")
+# Add a Camera as a child of Spinner, and move it back a bit (so that its facing Target, but from a distance)
+# Your nodes should now look this:
+#     Spatial (Main) ---Target ---Spatial (Spinner) ------Camera3D
+# Add a script to the camera with the following code
+# func _process(delta): 
+#      rotation.y += 1.0*delta
+# This should make the camera spin around your target. 
+
+# all rotations should be global
+
+class_name CameraController extends Node
 
 @export var cam: Camera3D
+@export var target: Node3D
 @export var ray_length: int = 1000
+@export var can_move: bool = false
 
+@export var SPEED: int = 100
 @export var PAN_BUTTON: MouseButton = MOUSE_BUTTON_MIDDLE	# not used
+
+@export_group("Limits")
+@export_range(0, 360) 	var spin_y_deg: float	#glob rotation.y
+@export_range(-89, -5) 	var spin_x_deg: float	#glob rotation.x
+@export_range(20, 100) 	var zoom_z: float		#position.z
+
+@onready var wasd_mover: 	Node3D = $wasd_mover
+@onready var spinner_y: 	Node3D = $wasd_mover/spinner_y
+@onready var spinner_x: 	Node3D = $wasd_mover/spinner_y/spinner_x
+@onready var mover_z: 		Node3D = $wasd_mover/spinner_y/spinner_x/mover_z
 
 ### this should be run in _physics_process()
 func raycast(mouse_screen_pos: Vector2) -> Dictionary:
-	var space_state: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+	var space_state: PhysicsDirectSpaceState3D = cam.get_world_3d().direct_space_state
 	var params := PhysicsRayQueryParameters3D.new()
 	params.from = cam.project_ray_origin(mouse_screen_pos)
 	params.to   = cam.project_ray_normal(mouse_screen_pos) * ray_length
@@ -30,10 +58,33 @@ func project_to_screen(mouse_screen_pos: Vector2) -> Vector3:
 
 
 func reset_pos():
-	position = Vector3.ZERO
+	wasd_mover.position = Vector3.ZERO
 
 
 func change_parent(cp: ControlPoint):
 	reset_pos()
 	reparent(cp, false)
 	pass
+
+func _ready():
+	spinner_y.global_rotation = Quaternion.IDENTITY.get_euler()
+	spinner_x.global_rotation = Quaternion.IDENTITY.get_euler()
+	spinner_y.global_rotate(Vector3.UP, deg_to_rad(spin_y_deg))
+	spinner_x.global_rotate(Vector3.LEFT, deg_to_rad(spin_x_deg))
+	mover_z.position.z = zoom_z
+
+	pass
+
+func _physics_process(delta: float):
+	if can_move:
+		move(delta)
+
+func move(dt: float):
+	var velocity: Vector2 = Input.get_vector(
+		"move_cam_left", 
+		"move_cam_right", 
+		"move_cam_forward", 
+		"move_cam_back"
+	)
+	wasd_mover.position += Vector3(velocity.x, 0, velocity.y) * dt * SPEED
+
