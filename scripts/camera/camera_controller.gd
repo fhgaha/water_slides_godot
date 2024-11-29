@@ -15,23 +15,24 @@ class_name CameraController extends Node
 
 @export var cam: Camera3D
 @export var target: Node3D
-@export var can_move: bool = false
 @export var RAY_LENGTH: int = 1000
 
+@export_group("Moving")
 @export var SPEED: int = 100
+
+@export_group("Rotating")
 @export var ROTATE_BUTTON: MouseButton = MOUSE_BUTTON_RIGHT
 @export var ROT_Y_SPEED: float = 0.010
 @export var ROT_X_SPEED: float = 0.005
-@export var PAN_BUTTON: MouseButton = MOUSE_BUTTON_MIDDLE # not used
-@export var ZOOM_SPEED: float = 100
-
-@export_group("Limits")
-@export_range(0, 360) 	var spin_y_deg: float	#glob rotation.y
+@export_range(0, 360) 				var spin_y_deg: float	#glob rotation.y
 const MIN_X_DEG: float = -89
 const MAX_X_DEG: float = -5
 @export_range(MIN_X_DEG, MAX_X_DEG) var spin_x_deg: float	#glob rotation.x
 const ZOOM_MIN: float = 20
 const ZOOM_MAX: float = 100
+
+@export_group("Zooming")
+@export var ZOOM_SPEED: float = 100
 @export_range(ZOOM_MIN, ZOOM_MAX)	var zoom_z: float		#position.z
 
 # controlled nodes
@@ -64,12 +65,14 @@ func project_to_screen(mouse_screen_pos: Vector2) -> Vector3:
 
 
 func reset_pos():
+	spinner_y.translate_object_local(Vector3.ZERO)
 	pass
 
 
 func change_parent(cp: ControlPoint):
 	reset_pos()
-	reparent(cp, false)
+	target = cp
+	spinner_y.reparent(target, false)
 	pass
 
 
@@ -82,8 +85,7 @@ func _ready():
 
 
 func _physics_process(delta: float):
-	if can_move:
-		move(delta)
+	move(delta)
 	rotate(delta)
 	zoom(delta)
 

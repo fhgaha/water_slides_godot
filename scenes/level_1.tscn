@@ -31,7 +31,7 @@ cull_mode = 2
 albedo_texture = ExtResource("3_fneqh")
 uv1_scale = Vector3(1, 0.1, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_jwbvs"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_om01n"]
 resource_local_to_scene = true
 _surfaces = [{
 "aabb": AABB(-1, 0, 0, 2, 21, 22.8853),
@@ -63,7 +63,7 @@ metadata/_edit_lock_ = true
 script = ExtResource("4_ua06q")
 cam = NodePath("spinner_y/spinner_x/mover_z/Camera3D")
 target = NodePath("../tube_0/segments/tube_segment_0/control_pts/end")
-can_move = true
+ROTATE_BUTTON = 3
 spin_y_deg = 189.0
 spin_x_deg = -20.0
 zoom_z = 40.0
@@ -97,15 +97,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 mesh = SubResource("CylinderMesh_0768u")
 skeleton = NodePath("../..")
 
-[node name="tube_0" type="Node3D" parent="."]
+[node name="tube_0" type="Node3D" parent="." node_paths=PackedStringArray("cam_ctrlr")]
 script = ExtResource("1_3cr4x")
+cam_ctrlr = NodePath("../cam_controller")
 
 [node name="segments" type="Node3D" parent="tube_0"]
 
 [node name="tube_segment_0" parent="tube_0/segments" instance=ExtResource("3_gufkc")]
 
 [node name="MeshInstance3D" parent="tube_0/segments/tube_segment_0" index="0"]
-mesh = SubResource("ArrayMesh_jwbvs")
+mesh = SubResource("ArrayMesh_om01n")
 
 [node name="start" parent="tube_0/segments/tube_segment_0/control_pts" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 20, 22.8853)

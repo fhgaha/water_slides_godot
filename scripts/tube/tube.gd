@@ -4,7 +4,7 @@ enum BuildState {Idle, Building}
 
 const TUBE_SEGMENT_SCENE = preload("res://scenes/tube_segment_0.tscn")
 
-@export var cam: CameraController
+@export var cam_ctrlr: CameraController
 
 @onready var segments: Node3D = $segments
 
@@ -64,7 +64,7 @@ func update_in_physics_process():
 				# set end pos to mouse pos
 				var length := 20
 				var mouse_screen_position: Vector2 = get_viewport().get_mouse_position()
-				var new_pos := cam.project_to_length(mouse_screen_position, length)
+				var new_pos := cam_ctrlr.project_to_length(mouse_screen_position, length)
 				cur_building_segm.end.position = new_pos
 
 			if Input.is_action_just_pressed("lmb_clicked"):
@@ -88,7 +88,7 @@ func _on_segm_cp_was_lmb_clicked(
 			build_state = BuildState.Building
 			cur_building_segm = spawn_new_segm(cp.global_position)
 			cur_building_segm.end.position = cp.position
-			cam.change_parent(cp)
+			cam_ctrlr.change_parent(cp)
 			pass
 		BuildState.Building:
 			# switch to idle mode
