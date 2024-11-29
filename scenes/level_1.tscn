@@ -31,7 +31,7 @@ cull_mode = 2
 albedo_texture = ExtResource("3_fneqh")
 uv1_scale = Vector3(1, 0.1, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_44ynj"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_jwbvs"]
 resource_local_to_scene = true
 _surfaces = [{
 "aabb": AABB(-1, 0, 0, 2, 21, 22.8853),
@@ -105,7 +105,7 @@ script = ExtResource("1_3cr4x")
 [node name="tube_segment_0" parent="tube_0/segments" instance=ExtResource("3_gufkc")]
 
 [node name="MeshInstance3D" parent="tube_0/segments/tube_segment_0" index="0"]
-mesh = SubResource("ArrayMesh_44ynj")
+mesh = SubResource("ArrayMesh_jwbvs")
 
 [node name="start" parent="tube_0/segments/tube_segment_0/control_pts" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 20, 22.8853)

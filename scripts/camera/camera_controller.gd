@@ -11,29 +11,30 @@
 #      rotation.y += 1.0*delta
 # This should make the camera spin around your target. 
 
-# all rotations should be global
-
 class_name CameraController extends Node
 
 @export var cam: Camera3D
 @export var target: Node3D
-@export var ray_length: int = 1000
 @export var can_move: bool = false
+@export var RAY_LENGTH: int = 1000
 
 @export var SPEED: int = 100
 @export var ROTATE_BUTTON: MouseButton = MOUSE_BUTTON_RIGHT
-@export var ROT_Y_SPEED: float = 0.01
-@export var ROT_X_SPEED: float = 0.01
-
-@export var PAN_BUTTON: MouseButton = MOUSE_BUTTON_MIDDLE
+@export var ROT_Y_SPEED: float = 0.010
+@export var ROT_X_SPEED: float = 0.005
+@export var PAN_BUTTON: MouseButton = MOUSE_BUTTON_MIDDLE # not used
+@export var ZOOM_SPEED: float = 100
 
 @export_group("Limits")
 @export_range(0, 360) 	var spin_y_deg: float	#glob rotation.y
 const MIN_X_DEG: float = -89
 const MAX_X_DEG: float = -5
 @export_range(MIN_X_DEG, MAX_X_DEG) var spin_x_deg: float	#glob rotation.x
-@export_range(20, 100) 				var zoom_z: float		#position.z
+const ZOOM_MIN: float = 20
+const ZOOM_MAX: float = 100
+@export_range(ZOOM_MIN, ZOOM_MAX)	var zoom_z: float		#position.z
 
+# controlled nodes
 @onready var spinner_y: 	Node3D = $spinner_y	# also this node is moved around on wasd
 @onready var spinner_x: 	Node3D = $spinner_y/spinner_x
 @onready var mover_z: 		Node3D = $spinner_y/spinner_x/mover_z
@@ -43,7 +44,7 @@ func raycast(mouse_screen_pos: Vector2) -> Dictionary:
 	var space_state: PhysicsDirectSpaceState3D = cam.get_world_3d().direct_space_state
 	var params := PhysicsRayQueryParameters3D.new()
 	params.from = cam.project_ray_origin(mouse_screen_pos)
-	params.to   = cam.project_ray_normal(mouse_screen_pos) * ray_length
+	params.to   = cam.project_ray_normal(mouse_screen_pos) * RAY_LENGTH
 	return space_state.intersect_ray(params)
 
 ### this should be run in _physics_process()
@@ -79,13 +80,12 @@ func _ready():
 	spinner_x.rotation.x = deg_to_rad(spin_x_deg)
 	mover_z.position.z = zoom_z
 
-	pass
-
 
 func _physics_process(delta: float):
 	if can_move:
 		move(delta)
 	rotate(delta)
+	zoom(delta)
 
 
 func move(dt: float):
@@ -100,13 +100,23 @@ func move(dt: float):
 
 func rotate(dt: float):
 	if Input.is_mouse_button_pressed(ROTATE_BUTTON):
-		var vel := Input.get_last_mouse_velocity()
+		var vel: Vector2 = Input.get_last_mouse_velocity()
 		spinner_y.rotation.y -= vel.x * dt * ROT_Y_SPEED
 
-		spinner_x.rotation.x -= vel.y * dt * 0.005
+		spinner_x.rotation.x -= vel.y * dt * ROT_X_SPEED
 		spinner_x.rotation.x = clampf(
 			spinner_x.rotation.x, 
 			deg_to_rad(MIN_X_DEG),
 			deg_to_rad(MAX_X_DEG), 
 		) 
-	pass
+
+
+func zoom(dt: float):
+	var val: float = 0.
+	if Input.is_action_just_pressed("zoom_in"):
+		val -= 1
+	if Input.is_action_just_pressed("zoom_out"):
+		val += 1
+	if !is_zero_approx(val):
+		mover_z.position.z += val * dt * ZOOM_SPEED
+		mover_z.position.z = clampf(mover_z.position.z, ZOOM_MIN, ZOOM_MAX)
