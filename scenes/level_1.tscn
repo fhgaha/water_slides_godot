@@ -31,7 +31,7 @@ cull_mode = 2
 albedo_texture = ExtResource("3_fneqh")
 uv1_scale = Vector3(1, 0.1, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_om01n"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_808wv"]
 resource_local_to_scene = true
 _surfaces = [{
 "aabb": AABB(-1, 0, 0, 2, 21, 22.8853),
@@ -56,7 +56,7 @@ resource_local_to_scene = true
 shading_mode = 0
 albedo_color = Color(0.86, 0.845667, 0, 1)
 
-[node name="level_1" type="Node3D"]
+[node name="level_1" type="Node"]
 metadata/_edit_lock_ = true
 
 [node name="cam_controller" type="Node" parent="." node_paths=PackedStringArray("cam", "target")]
@@ -64,7 +64,7 @@ script = ExtResource("4_ua06q")
 cam = NodePath("spinner_y/spinner_x/mover_z/Camera3D")
 target = NodePath("../tube_0/segments/tube_segment_0/control_pts/end")
 ROTATE_BUTTON = 3
-spin_y_deg = 189.0
+spin_y_deg = 190.0
 spin_x_deg = -20.0
 zoom_z = 40.0
 
@@ -79,6 +79,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 40)
 
 [node name="Camera3D" type="Camera3D" parent="cam_controller/spinner_y/spinner_x/mover_z"]
 transform = Transform3D(1, 0, 0, -1.49012e-08, 1, -2.98023e-08, -2.98023e-08, 0, 1, 0, 0, 0)
+current = true
 metadata/_edit_lock_ = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -106,7 +107,7 @@ cam_ctrlr = NodePath("../cam_controller")
 [node name="tube_segment_0" parent="tube_0/segments" instance=ExtResource("3_gufkc")]
 
 [node name="MeshInstance3D" parent="tube_0/segments/tube_segment_0" index="0"]
-mesh = SubResource("ArrayMesh_om01n")
+mesh = SubResource("ArrayMesh_808wv")
 
 [node name="start" parent="tube_0/segments/tube_segment_0/control_pts" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 20, 22.8853)

@@ -43,17 +43,17 @@ func spawn_new_segm(spawn_global_pos: Vector3) -> TubeSegment:
 	add_segm(new_segm)
 	# new_segm.name = "tube_segment_1"
 	new_segm.start.global_position = spawn_global_pos
-	var some_offset: Vector3 = Vector3.FORWARD * 10 + Vector3.DOWN * 10
-	new_segm.end.global_position = spawn_global_pos + some_offset
+	# var some_offset: Vector3 = Vector3.FORWARD * 10 + Vector3.DOWN * 10
+	# new_segm.end.global_position = spawn_global_pos + some_offset
 	return new_segm
 
 
 func _physics_process(_delta):
-	update_in_physics_process()
+	_update_in_physics_process()
 	pass
 
 
-func update_in_physics_process():
+func _update_in_physics_process():
 	match build_state:
 		BuildState.Idle:
 			pass

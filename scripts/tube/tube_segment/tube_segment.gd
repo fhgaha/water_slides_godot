@@ -213,8 +213,8 @@ func square_with_center(mesh: ArrayMesh):
 	surface_array[Mesh.ARRAY_TEX_UV] = uvs
 	surface_array[Mesh.ARRAY_NORMAL] = normals
 	surface_array[Mesh.ARRAY_INDEX] = indices
-	prints("vertex:", verts.size(), "uvs:", uvs.size(), \
-	"normals:", normals.size(), "indices:", indices.size())
+	# prints("vertex:", verts.size(), "uvs:", uvs.size(), \
+	# "normals:", normals.size(), "indices:", indices.size())
 	#Output: vertex: 9 uvs: 9 normals: 9 indices: 12
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
 
@@ -361,7 +361,7 @@ func sample(f_arr: Array[float], t: float) -> float:
 	return lerpf(f_arr[id_lower], f_arr[id_upper], i_float - id_lower)
 
 
-func _on_control_pt_transform_changed(sender: ControlPoint):
+func _on_control_pt_transform_changed(_sender: ControlPoint):
 	# prints(sender.name, "child's local transform has changed!")
 	clear_and_try_generate()
 
