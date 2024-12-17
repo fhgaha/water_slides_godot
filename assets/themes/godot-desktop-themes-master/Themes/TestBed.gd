@@ -2,13 +2,17 @@ extends Node
 
 @onready var themesCtrl = $GUI/TaskBar/Themes
 @onready var gui = $GUI
-@onready var controlsDialog = preload ("res://Themes/TestDialog.tscn")
+# @onready var controlsDialog = preload ("res://Themes/TestDialog.tscn")
+@onready var controlsDialog = preload("res://assets/themes/godot-desktop-themes-master/Themes/TestDialog.tscn")
 
 var themes = {
 	0: ThemeItem.new("Default", "."),
-	1: ThemeItem.new("Classic 3.11", "res://Themes/Classic311/Classic311.tres"),
-	2: ThemeItem.new("Classic 95", "res://Themes/Classic95/Classic95.tres"),
-	3: ThemeItem.new("Modern 11 (WIP)", "res://Themes/Modern11/Modern11.tres")
+	# 1: ThemeItem.new("Classic 3.11", "res://Themes/Classic311/Classic311.tres"),
+	# 2: ThemeItem.new("Classic 95", "res://Themes/Classic95/Classic95.tres"),
+	# 3: ThemeItem.new("Modern 11 (WIP)", "res://Themes/Modern11/Modern11.tres")
+	1: ThemeItem.new("Classic 3.11", "res://assets/themes/godot-desktop-themes-master/Themes/Classic311/Classic311.tres"),
+	2: ThemeItem.new("Classic 95", "res://assets/themes/godot-desktop-themes-master/Themes/Classic95/Classic95.tres"),
+	3: ThemeItem.new("Modern 11 (WIP)", "res://assets/themes/godot-desktop-themes-master/Themes/Modern11/Modern11.tres")
 }
 
 func _ready():
