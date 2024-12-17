@@ -1,41 +1,16 @@
-[gd_resource type="Theme" load_steps=6 format=3 uid="uid://20d65gl01b5t"]
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://20d65gl01b5t"]
 
-[ext_resource type="Script" path="res://assets/themes/neumorphism_theme/styles/StyleBoxMulti.gd" id="1_4w75d"]
+[ext_resource type="StyleBox" uid="uid://b2psh0irq8a6" path="res://assets/themes/neumorphism_theme/styles/button/normal/normal_combined.tres" id="1_y60gk"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f4pu6"]
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-shadow_color = Color(1, 1, 1, 1)
-shadow_size = 10
-shadow_offset = Vector2(-5, -5)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ud14s"]
-bg_color = Color(0.878431, 0.878431, 0.878431, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-shadow_color = Color(0.745098, 0.745098, 0.745098, 1)
-shadow_size = 10
-shadow_offset = Vector2(5, 5)
-
-[sub_resource type="StyleBox" id="StyleBox_j8vdj"]
-resource_local_to_scene = false
-resource_name = ""
-content_margin_left = -1.0
-content_margin_top = -1.0
-content_margin_right = -1.0
-content_margin_bottom = -1.0
-script = ExtResource("1_4w75d")
-style_boxes = Array[StyleBox]([SubResource("StyleBoxFlat_f4pu6"), SubResource("StyleBoxFlat_ud14s")])
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nmqgc"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_58maw"]
 bg_color = Color(0.878431, 0.878431, 0.878431, 1)
 
 [resource]
 Button/colors/font_color = Color(0.125911, 0.125911, 0.125911, 1)
-Button/styles/normal = SubResource("StyleBox_j8vdj")
+Button/styles/disabled = SubResource("StyleBoxFlat_nmqgc")
+Button/styles/normal = ExtResource("1_y60gk")
 Editor/colors/base_color = Color(0.878431, 0.878431, 0.878431, 1)
 Panel/styles/panel = SubResource("StyleBoxFlat_58maw")
+VBoxContainer/constants/separation = 8
