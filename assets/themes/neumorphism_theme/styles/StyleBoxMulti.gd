@@ -8,9 +8,9 @@ func _draw(canvas_item: RID, rect: Rect2) -> void:
 		if style_box:
 			#compensate shadows sticking out
 			var margined_rect:= Rect2(
-				rect.position.x + content_margin_left,
-				rect.position.y + content_margin_top/2,
-				rect.size.x 	- content_margin_right,
-				rect.size.y 	- content_margin_bottom
+				rect.position.x + get_margin(SIDE_LEFT),
+				rect.position.y + get_margin(SIDE_TOP)/2,
+				rect.size.x 	- get_margin(SIDE_RIGHT),
+				rect.size.y 	- get_margin(SIDE_BOTTOM)
 			)
 			style_box.draw(canvas_item, margined_rect)
