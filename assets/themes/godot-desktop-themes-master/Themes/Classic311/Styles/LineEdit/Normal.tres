@@ -1,6 +1,6 @@
 [gd_resource type="StyleBoxTexture" load_steps=2 format=3 uid="uid://byaiiug5rvdj5"]
 
-[ext_resource type="Texture2D" uid="uid://od2drgff0v6q" path="res://assets/godot-desktop-themes-master/Themes/Classic311/Styles/LineEdit/Normal.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://od2drgff0v6q" path="res://assets/themes/godot-desktop-themes-master/Themes/Classic311/Styles/LineEdit/Normal.png" id="1"]
 
 [resource]
 content_margin_left = 5.0

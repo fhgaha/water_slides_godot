@@ -1,6 +1,6 @@
-[gd_resource type="StyleBox" script_class="StyleBoxMulti" load_steps=4 format=3 uid="uid://danpl6qv6v7gx"]
+[gd_resource type="StyleBox" script_class="StyleBoxLineEdit" load_steps=4 format=3 uid="uid://bo6l8vox0y6vu"]
 
-[ext_resource type="Script" path="res://assets/themes/neumorphism_theme/styles/StyleBoxMulti.gd" id="1_3f1hh"]
+[ext_resource type="Script" path="res://assets/themes/neumorphism_theme/styles/StyleBoxLineEdit.gd" id="1_5v6dd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vempf"]
 content_margin_left = 10.0
@@ -36,8 +36,8 @@ corner_detail = 4
 resource_local_to_scene = false
 resource_name = ""
 content_margin_left = 10.0
-content_margin_top = 10.0
+content_margin_top = -1.0
 content_margin_right = 10.0
-content_margin_bottom = 10.0
-script = ExtResource("1_3f1hh")
+content_margin_bottom = -1.0
+script = ExtResource("1_5v6dd")
 style_boxes = Array[StyleBox]([SubResource("StyleBoxFlat_vempf"), SubResource("StyleBoxFlat_nuoa4")])
