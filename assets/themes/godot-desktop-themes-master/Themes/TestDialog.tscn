@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://chfo8b0kmgwjy"]
 
-[ext_resource type="Script" path="res://assets/godot-desktop-themes-master/Themes/TestDialog.gd" id="1_wxgor"]
+[ext_resource type="Script" path="res://assets/themes/godot-desktop-themes-master/Themes/TestDialog.gd" id="1_wxgor"]
 
 [node name="TestDialog" type="PanelContainer"]
 anchors_preset = 15
@@ -22,11 +22,13 @@ anchor_right = 0.979167
 anchor_bottom = 0.962963
 grow_horizontal = 2
 grow_vertical = 2
+current_tab = 0
 drag_to_rearrange_enabled = true
 metadata/_edit_use_anchors_ = true
 
 [node name="Buttons" type="Control" parent="Control/TabContainer"]
 layout_mode = 2
+metadata/_tab_index = 0
 
 [node name="Control" type="Control" parent="Control/TabContainer/Buttons"]
 anchors_preset = 0
@@ -173,6 +175,7 @@ text = "Option 3"
 [node name="Editors" type="Control" parent="Control/TabContainer"]
 visible = false
 layout_mode = 2
+metadata/_tab_index = 1
 
 [node name="LineEdit" type="LineEdit" parent="Control/TabContainer/Editors"]
 layout_mode = 0
@@ -220,6 +223,7 @@ suffix = "px"
 [node name="Extra" type="Control" parent="Control/TabContainer"]
 visible = false
 layout_mode = 2
+metadata/_tab_index = 2
 
 [node name="HScrollBar2" type="HScrollBar" parent="Control/TabContainer/Extra"]
 layout_mode = 0

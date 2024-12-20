@@ -1,8 +1,51 @@
-[gd_resource type="Theme" load_steps=5 format=3 uid="uid://20d65gl01b5t"]
+[gd_resource type="Theme" load_steps=16 format=3 uid="uid://20d65gl01b5t"]
 
-[ext_resource type="StyleBox" uid="uid://b2psh0irq8a6" path="res://assets/themes/neumorphism_theme/styles/button/normal.tres" id="1_0ojtw"]
-[ext_resource type="StyleBox" uid="uid://danpl6qv6v7gx" path="res://assets/themes/neumorphism_theme/styles/button/pressed.tres" id="2_mt0h0"]
-[ext_resource type="StyleBox" uid="uid://bo6l8vox0y6vu" path="res://assets/themes/neumorphism_theme/styles/line_edit/normal.tres" id="3_e7juy"]
+[ext_resource type="StyleBox" uid="uid://bl0hb3spcoxjv" path="res://assets/themes/neumorphism_theme/styles/button/normal.tres" id="1_i3gjk"]
+[ext_resource type="StyleBox" uid="uid://e4kiv7vt4anm" path="res://assets/themes/neumorphism_theme/styles/button/pressed.tres" id="2_17yj0"]
+[ext_resource type="Script" path="res://assets/themes/neumorphism_theme/styles/StyleBoxNeuNormal.gd" id="3_lk5d4"]
+[ext_resource type="StyleBox" uid="uid://b5kw1mqmhjsgk" path="res://assets/themes/neumorphism_theme/styles/line_edit/normal.tres" id="4_pp36e"]
+[ext_resource type="StyleBox" uid="uid://b2wx2geifct5c" path="res://assets/themes/neumorphism_theme/styles/pressed_top.tres" id="5_6ilv3"]
+[ext_resource type="StyleBox" uid="uid://cgxp02orp0jm2" path="res://assets/themes/neumorphism_theme/styles/pressed_bot.tres" id="6_0wpio"]
+
+[sub_resource type="StyleBox" id="StyleBox_w7hur"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = -1.0
+script = ExtResource("3_lk5d4")
+style_boxes = Array[StyleBoxFlat]([])
+
+[sub_resource type="StyleBox" id="StyleBox_kgn35"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = -1.0
+script = ExtResource("3_lk5d4")
+style_boxes = Array[StyleBoxFlat]([])
+
+[sub_resource type="StyleBox" id="StyleBox_tdxmi"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = -1.0
+script = ExtResource("3_lk5d4")
+style_boxes = Array[StyleBoxFlat]([])
+
+[sub_resource type="StyleBox" id="StyleBox_dtt18"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = -1.0
+script = ExtResource("3_lk5d4")
+style_boxes = Array[StyleBoxFlat]([])
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_58maw"]
 bg_color = Color(0.878431, 0.878431, 0.878431, 1)
@@ -11,18 +54,77 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
+[sub_resource type="StyleBox" id="StyleBox_ifr2m"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+script = ExtResource("3_lk5d4")
+style_boxes = Array[StyleBoxFlat]([ExtResource("5_6ilv3"), ExtResource("6_0wpio")])
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2rtvu"]
+bg_color = Color(0.878431, 0.878431, 0.878431, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+corner_detail = 4
+shadow_color = Color(1, 1, 1, 1)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wbxbg"]
+bg_color = Color(0.878431, 0.878431, 0.878431, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+corner_detail = 4
+shadow_color = Color(0.745098, 0.745098, 0.745098, 1)
+shadow_size = 10
+shadow_offset = Vector2(5, 5)
+
+[sub_resource type="StyleBox" id="StyleBox_582ys"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+script = ExtResource("3_lk5d4")
+style_boxes = Array[StyleBoxFlat]([SubResource("StyleBoxFlat_2rtvu"), SubResource("StyleBoxFlat_wbxbg")])
+
 [resource]
 Button/colors/font_color = Color(0.125911, 0.125911, 0.125911, 1)
 Button/colors/font_disabled_color = Color(0, 0, 0, 0.376471)
 Button/colors/font_focus_color = Color(0.12549, 0.12549, 0.12549, 1)
 Button/colors/font_hover_color = Color(0.12549, 0.12549, 0.12549, 1)
 Button/colors/font_pressed_color = Color(0.12549, 0.12549, 0.12549, 1)
-Button/styles/disabled = ExtResource("1_0ojtw")
-Button/styles/hover = ExtResource("1_0ojtw")
-Button/styles/normal = ExtResource("1_0ojtw")
-Button/styles/pressed = ExtResource("2_mt0h0")
+Button/styles/disabled = ExtResource("1_i3gjk")
+Button/styles/hover = ExtResource("1_i3gjk")
+Button/styles/normal = ExtResource("1_i3gjk")
+Button/styles/pressed = ExtResource("2_17yj0")
+ColorPickerButton/styles/focus = SubResource("StyleBox_w7hur")
+ColorPickerButton/styles/hover = SubResource("StyleBox_kgn35")
+ColorPickerButton/styles/normal = SubResource("StyleBox_tdxmi")
+ColorPickerButton/styles/pressed = SubResource("StyleBox_dtt18")
 Editor/colors/base_color = Color(0.878431, 0.878431, 0.878431, 1)
 Label/colors/font_color = Color(0, 0, 0, 1)
+LineEdit/colors/caret_color = Color(0, 0, 0, 1)
 LineEdit/colors/font_color = Color(0, 0, 0, 1)
-LineEdit/styles/normal = ExtResource("3_e7juy")
+LineEdit/styles/normal = ExtResource("4_pp36e")
+MenuButton/styles/normal = null
 Panel/styles/panel = SubResource("StyleBoxFlat_58maw")
+TabContainer/colors/font_disabled_color = Color(0, 0, 0, 0.376471)
+TabContainer/colors/font_hovered_color = Color(0.415979, 0.415981, 0.415981, 1)
+TabContainer/colors/font_selected_color = Color(0, 0, 0, 1)
+TabContainer/colors/font_unselected_color = Color(0, 0, 0, 1)
+TabContainer/styles/panel = ExtResource("4_pp36e")
+TabContainer/styles/tab_disabled = null
+TabContainer/styles/tab_hovered = null
+TabContainer/styles/tab_selected = SubResource("StyleBox_ifr2m")
+TabContainer/styles/tab_unselected = SubResource("StyleBox_582ys")
+TextEdit/colors/caret_color = Color(0, 0, 0, 1)
+TextEdit/colors/font_color = Color(0, 0, 0, 1)
+TextEdit/styles/normal = ExtResource("4_pp36e")

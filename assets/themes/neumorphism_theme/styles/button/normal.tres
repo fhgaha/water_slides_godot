@@ -1,8 +1,8 @@
-[gd_resource type="StyleBox" script_class="StyleBoxMulti" load_steps=4 format=3 uid="uid://b2psh0irq8a6"]
+[gd_resource type="StyleBox" script_class="StyleBoxNeuNormal" load_steps=4 format=3 uid="uid://bl0hb3spcoxjv"]
 
-[ext_resource type="Script" path="res://assets/themes/neumorphism_theme/styles/StyleBoxMulti.gd" id="1_fymjj"]
+[ext_resource type="Script" path="res://assets/themes/neumorphism_theme/styles/StyleBoxNeuNormal.gd" id="1_qrxqp"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f4pu6"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2rtvu"]
 bg_color = Color(0.878431, 0.878431, 0.878431, 1)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
@@ -11,9 +11,8 @@ corner_radius_bottom_left = 5
 corner_detail = 4
 shadow_color = Color(1, 1, 1, 1)
 shadow_size = 10
-shadow_offset = Vector2(-5, -5)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ud14s"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wbxbg"]
 bg_color = Color(0.878431, 0.878431, 0.878431, 1)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
@@ -31,5 +30,5 @@ content_margin_left = 10.0
 content_margin_top = 10.0
 content_margin_right = 10.0
 content_margin_bottom = 10.0
-script = ExtResource("1_fymjj")
-style_boxes = Array[StyleBox]([SubResource("StyleBoxFlat_f4pu6"), SubResource("StyleBoxFlat_ud14s")])
+script = ExtResource("1_qrxqp")
+style_boxes = Array[StyleBoxFlat]([SubResource("StyleBoxFlat_2rtvu"), SubResource("StyleBoxFlat_wbxbg")])

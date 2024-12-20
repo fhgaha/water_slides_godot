@@ -1,36 +1,8 @@
-[gd_resource type="StyleBox" script_class="StyleBoxLineEdit" load_steps=4 format=3 uid="uid://bo6l8vox0y6vu"]
+[gd_resource type="StyleBox" script_class="StyleBoxNeuPressed" load_steps=4 format=3 uid="uid://b5kw1mqmhjsgk"]
 
-[ext_resource type="Script" path="res://assets/themes/neumorphism_theme/styles/StyleBoxLineEdit.gd" id="1_5v6dd"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vempf"]
-content_margin_left = 10.0
-content_margin_top = 10.0
-content_margin_right = 10.0
-content_margin_bottom = 10.0
-bg_color = Color(0.878431, 0.878431, 0.878431, 1)
-draw_center = false
-border_width_left = 10
-border_width_top = 10
-border_color = Color(0.745098, 0.745098, 0.745098, 1)
-border_blend = true
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-corner_detail = 4
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nuoa4"]
-bg_color = Color(0.878431, 0.878431, 0.878431, 1)
-draw_center = false
-border_width_right = 10
-border_width_bottom = 10
-border_color = Color(1, 1, 1, 0.847059)
-border_blend = true
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-corner_detail = 4
+[ext_resource type="Script" path="res://assets/themes/neumorphism_theme/styles/StyleBoxNeuPressed.gd" id="1_tfqfb"]
+[ext_resource type="StyleBox" uid="uid://b2wx2geifct5c" path="res://assets/themes/neumorphism_theme/styles/pressed_top.tres" id="2_0h6d8"]
+[ext_resource type="StyleBox" uid="uid://cgxp02orp0jm2" path="res://assets/themes/neumorphism_theme/styles/pressed_bot.tres" id="3_s3cnk"]
 
 [resource]
 resource_local_to_scene = false
@@ -39,5 +11,5 @@ content_margin_left = 10.0
 content_margin_top = -1.0
 content_margin_right = 10.0
 content_margin_bottom = -1.0
-script = ExtResource("1_5v6dd")
-style_boxes = Array[StyleBox]([SubResource("StyleBoxFlat_vempf"), SubResource("StyleBoxFlat_nuoa4")])
+script = ExtResource("1_tfqfb")
+style_boxes = Array[StyleBoxFlat]([ExtResource("2_0h6d8"), ExtResource("3_s3cnk")])
